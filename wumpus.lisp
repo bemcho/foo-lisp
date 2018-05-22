@@ -196,10 +196,10 @@
 ;; world.
 
 
-(defparameter *unit* 16)
+(defparameter *unit* 8)
  (defun units (n) (* *unit* n))
- (defparameter *width* 640)
- (defparameter *height* 480)
+ (defparameter *width* 1024)
+ (defparameter *height* 720)
 
 ;; Defining Xelf game objects
 
