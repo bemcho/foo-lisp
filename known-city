@@ -1,0 +1,4 @@
+graph{
+23[label="(23 *)"];
+29[label="(29 FOO-LISP::?)"];
+23--29[label=""];}
