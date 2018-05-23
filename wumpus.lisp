@@ -197,10 +197,14 @@
 
 
 (defparameter *unit* 8)
- (defun units (n) (* *unit* n))
- (defparameter *width* 1024)
- (defparameter *height* 720)
+(defun units (n) (* *unit* n))
 
+(defparameter *width* 1024)
+(defparameter *height* 720)
+(defparameter *city-node-size* 3)
+(defparameter *space-btw-nodes* 3)
+
+(defparameter *objects-size* 1)
 ;; Defining Xelf game objects
 
 ;; Now it's time to define some game objects. Xelf game objects are
@@ -220,7 +224,7 @@
 (defclass wumpus-sprite (node)
    ((height :initform (units 1))
     (width :initform (units 1))
-    (color :initform "white")
+    (color :initform "pink")
     (speed :initform 1)
     (heading :initform (direction-heading :downright))))
 
@@ -236,14 +240,49 @@
 
 
 
+;; street
+(defun make-street (x-start y-start x-end y-end width height)
+  "Simply remove wall nodes where street should pass"
+  (let ((left x)
+        (top y)
+        (right (+ x width))
+        (bottom (+ y height)))
+;;code goes here
+    )
+  )
 ;; Now we need walls around the game world in order to contain the
 ;; ball.
+;; cops
+(defclass city-node (node)
+  ((color :initform "dark orchid")))
 
+(defclass wumpus (node)
+  ((color :initform "gold")))
+
+(defclass blood (node)
+  ((color :initform "red")))
+
+(defclass cops (node)
+  ((color :initform "blue")))
+
+(defclass sirens (node)
+  ((color :initform "cyan")))
+
+(defclass glowworm (node)
+  ((color :initform "hot pink")))
+
+(defclass lights (node)
+  ((color :initform "orange")))
 
 (defclass wall (node)
    ((color :initform "gray50")))
 
-;; Handling collisions
+;;
+(defun make-object (x y width height object-type)
+  (let ((wall (make-instance object-type)))
+    (resize wall width height)
+    (move-to wall x y)
+    wall))
 
 ;; We want the ball to bounce off of the walls. The [[file:dictionary/COLLIDE.html][COLLIDE]] method is
 ;; called for every frame on all pairs of objects whose bounding boxes
@@ -254,9 +293,8 @@
   (with-slots (heading speed x y) wumpus-sprite
      ;; back away from wall
     (move wumpus-sprite (opposite-heading heading) speed)
-    
     ;; sometimes choose another direction to prevent getting stuck
-     (percent-of-time 10 (incf heading (radian-angle 90)))))
+    (percent-of-time 10 (incf heading (radian-angle 90)))))
 
 ;; Making noise
 
@@ -320,23 +358,62 @@
 
 
 (defun make-border (x y width height)
-   (let ((left x)
- 	(top y)
- 	(right (+ x width))
- 	(bottom (+ y height)))
-     (with-new-buffer
+  (let ((left x)
+        (top y)
+        (right (+ x width))
+        (bottom (+ y height)))
+    (with-new-buffer
        ;; top wall
-       (insert (make-wall left top (- right left) (units 1)))
+      (insert (make-wall left top (- right left) (units 1)))
        ;; bottom wall
-       (insert (make-wall left bottom (- right left (units -1)) (units 1)))
+      (insert (make-wall left bottom (- right left (units -1)) (units 1)))
        ;; left wall
-       (insert (make-wall left top (units 1) (- bottom top)))
+      (insert (make-wall left top (units 1) (- bottom top)))
        ;; right wall
-       (insert (make-wall right top (units 1) (- bottom top (units -1))))
+      (insert (make-wall right top (units 1) (- bottom top (units -1))))
        ;; send it all back
-       (current-buffer))))
+      (current-buffer))))
 
+(defun make-border (x y width height)
+  (let ((left x)
+        (top y)
+        (right (+ x width))
+        (bottom (+ y height)))
+    (with-new-buffer
+       ;; top wall
+      (insert (make-wall left top (- right left) (units 1)))
+       ;; bottom wall
+      (insert (make-wall left bottom (- right left (units -1)) (units 1)))
+       ;; left wall
+      (insert (make-wall left top (units 1) (- bottom top)))
+       ;; right wall
+      (insert (make-wall right top (units 1) (- bottom top (units -1))))
+       ;; send it all back
+      (current-buffer))))
 
+(defun get-class-for (wumpus-city-symbol)
+  "Return class type eg: LIGHTS! -> lights"
+  (cond ((eql wumpus-city-symbol 'LIGHTS!) 'lights)
+        ((eql wumpus-city-symbol 'SIRENS!) 'sirens)
+        ((eql wumpus-city-symbol 'BLOOD!) 'blood)
+        ((eql wumpus-city-symbol 'WUMPUS) 'wumpus)
+        ((eql wumpus-city-symbol 'GLOW-WORM) 'glowworm)
+        ((eql wumpus-city-symbol 'COPS) 'cops)
+        ))
+(defun insert-objects (x y objects)
+  "Inserts objects starting from x,y"
+  (dolist (obj objects)
+    (insert (make-object (+ x *objects-size*) (+ y *objects-size*) (units *objects-size*) (units *objects-size*) (get-class-for obj)))))
+
+(defun populate-city (city-nodes)
+  (with-new-buffer
+    (dolist (node city-nodes)
+      (let ((x (+ (units (car node)) (+ (units *city-node-size*) (units *space-btw-nodes*))))
+            (y (+ (units (car node)) (+ (units *city-node-size*)  (units *space-btw-nodes*))))
+            (objects (rest node)))
+            (insert (make-object x y (units *city-node-size*) (units *city-node-size*) 'city-node))
+            (and objects (insert-objects x y objects))))
+       (current-buffer)))
 
 ;; See also [[file:dictionary/INSERT.html][INSERT]] and [[file:dictionary/CURRENT-BUFFER.html][CURRENT-BUFFER]].
 
@@ -383,9 +460,11 @@
 (defmethod start-game ((wumpus-world  wumpus-world))
   (with-slots ( wumpus-sprite) wumpus-world
     (with-buffer wumpus-world
-       (insert  wumpus-sprite)
-       (move-to wumpus-sprite 80 280)
-       (paste-from wumpus-world (make-border 0 0 (- *width* (units 1)) (- *height* (units 1))))
+      (new-game)
+      (insert  wumpus-sprite)
+      (move-to wumpus-sprite 80 120)
+      (paste-from wumpus-world (make-border 0 0 (- *width* (units 1)) (- *height* (units 1))))
+      (paste-from wumpus-world (populate-city *congestion-city-nodes*))
        )))
 
 
@@ -396,7 +475,8 @@
 
 
 (defun wumpus-game ()
-   ;; Configure the screen dimensions
+  ;; Configure the screen dimensions
+  (setf *window-title* "Grand Theft Wumpus")
    (setf *screen-height* *height*)
    (setf *screen-width* *width*)
    ;; Allow resizing of window and scaling
@@ -405,7 +485,10 @@
    (with-session
      (open-project :foo-lisp)
      ;; this indexes everything defined with DEFRESOURCE
-     (index-pending-resources) 
+     (index-all-images)
+     (index-all-samples)
+     (index-pending-resources)
+     (preload-resources)
      (let ((wumpus-world (make-instance 'wumpus-world)))
        ;; start the buffer running
        (switch-to-buffer wumpus-world)
