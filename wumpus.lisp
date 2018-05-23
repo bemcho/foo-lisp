@@ -201,25 +201,12 @@
 
 (defparameter *width* 1024)
 (defparameter *height* 720)
-(defparameter *city-node-size* 3)
-(defparameter *space-btw-nodes* 3)
-
-(defparameter *objects-size* 1)
-;; Defining Xelf game objects
-
-;; Now it's time to define some game objects. Xelf game objects are
-;; called "nodes", and they can interact in two dimensions by being
-;; grouped into "buffers" of different kinds. Naturally there are base
-;; classes called NODE and BUFFER. These classes define the basic
-;; behaviors of the game engine.  Nodes are endowed with such properties
-;; as an (X Y) position, width, height, an image to be displayed, and so
-;; on. The default node behaviors also hook all game objects into buffer
-;; features, such as collision detection, pathfinding, and serialization.
-
-;; To define nodes of your own, use DEFCLASS and give NODE as a
-;; superclass. You can override the default values of NODE slots, as well
-;; as add your own.
-
+(defparameter *city-node-size* (units 4))
+(defparameter *space-btw-nodes* (units 2))
+(defparameter *node-offset* (+ *city-node-size* *space-btw-nodes*))
+(defparameter *objects-size* (units 1))
+(defparameter *x-max-objects* (floor *width* *space-btw-nodes*))
+(defparameter *y-max-objects* (floor *height* *city-node-size*))
 
 (defclass wumpus-sprite (node)
    ((height :initform (units 1))
@@ -257,7 +244,7 @@
   ((color :initform "dark orchid")))
 
 (defclass wumpus (node)
-  ((color :initform "gold")))
+  ((color :initform "black")))
 
 (defclass blood (node)
   ((color :initform "red")))
@@ -272,17 +259,17 @@
   ((color :initform "hot pink")))
 
 (defclass lights (node)
-  ((color :initform "orange")))
+  ((color :initform "pink")))
 
 (defclass wall (node)
    ((color :initform "gray50")))
 
 ;;
 (defun make-object (x y width height object-type)
-  (let ((wall (make-instance object-type)))
-    (resize wall width height)
-    (move-to wall x y)
-    wall))
+  (let ((obj (make-instance object-type)))
+    (resize obj width height)
+    (move-to obj x y)
+    obj))
 
 ;; We want the ball to bounce off of the walls. The [[file:dictionary/COLLIDE.html][COLLIDE]] method is
 ;; called for every frame on all pairs of objects whose bounding boxes
@@ -307,25 +294,7 @@
 (defmethod collide :after((wumpus-sprite wumpus-sprite) (node node))
   (play-sample "bip.wav"))
 
-;; Destructible colored bricks
-
-;; Now it's time to bash some bricks! First we define the dimensions
-;; of a brick and create a class.
-
-
-
-;; Referring to global objects
-
-;; Now we define some useful shorthand functions to refer to the ball and
-;; paddle.
-
-
 (defun  wumpus-sprite () (slot-value (current-buffer) 'wumpus-sprite))
-
-
-
-
-
 ;; See also:
 
 ;;  - [[file:dictionary/KEYBOARD-DOWN-P.html][KEYBOARD-DOWN-P]]
@@ -400,18 +369,37 @@
         ((eql wumpus-city-symbol 'GLOW-WORM) 'glowworm)
         ((eql wumpus-city-symbol 'COPS) 'cops)
         ))
+
 (defun insert-objects (x y objects)
   "Inserts objects starting from x,y"
-  (dolist (obj objects)
-    (insert (make-object (+ x *objects-size*) (+ y *objects-size*) (units *objects-size*) (units *objects-size*) (get-class-for obj)))))
+  (let ((counter 4))
+      (dolist (obj objects)
+        (let* ((xo (+ x  counter))
+               (yo (+ y  counter)))
+          (insert (make-object xo yo  *objects-size*  *objects-size* (get-class-for obj)))
+          (setf counter (+ counter *objects-size*))))))
+
+(defun get-x (node-pos)
+  "doc"
+  (let ((new-x  (+ (* (random *x-max-objects*) node-pos) *node-offset* )))
+    (if (<= (+ new-x *node-offset*) *width*)
+        new-x
+        (get-x node-pos))))
+
+(defun get-y (node-pos)
+  "doc"
+  (let ((new-y  (+ (* (random *y-max-objects*) node-pos) *node-offset* )))
+    (if (<= (+ new-y *node-offset*) *height*)
+        new-y
+        (get-y node-pos))))
 
 (defun populate-city (city-nodes)
   (with-new-buffer
     (dolist (node city-nodes)
-      (let ((x (+ (units (car node)) (+ (units *city-node-size*) (units *space-btw-nodes*))))
-            (y (+ (units (car node)) (+ (units *city-node-size*)  (units *space-btw-nodes*))))
+      (let ((x (get-x (car node)))
+            (y (get-y (car node)))
             (objects (rest node)))
-            (insert (make-object x y (units *city-node-size*) (units *city-node-size*) 'city-node))
+            (insert (make-object x y *city-node-size* *city-node-size* 'city-node))
             (and objects (insert-objects x y objects))))
        (current-buffer)))
 
