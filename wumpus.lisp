@@ -196,12 +196,12 @@
 ;; world.
 
 
-(defparameter *unit* 8)
+(defparameter *unit* 10)
 (defun units (n) (* *unit* n))
 
 (defparameter *width* 1024)
 (defparameter *height* 720)
-(defparameter *city-node-size* (units 4))
+(defparameter *city-node-size* (units 6))
 (defparameter *space-btw-nodes* (units 4))
 (defparameter *node-offset* (+ *city-node-size* *space-btw-nodes*))
 (defparameter *objects-size* (units 1))
@@ -209,13 +209,20 @@
 (defparameter *y-max-objects* (floor *height* *city-node-size*))
 
 
-(defclass wumpus-sprite (node)
-   ((height :initform (units 1))
-    (width :initform (units 1))
-    (color :initform "dark orchid")
-    (image :initform "wumpus.png")
-    (speed :initform 1)
-    (heading :initform (direction-heading :downright))))
+(defclass wumpus-hunter-sprite (node)
+  ((height :initform (units 2))
+   (width :initform (units 2))
+   (max-dx :initform 100)
+   (max-dy :initform 100)
+   (max-ddx :initform 0.01)
+   (max-ddy :initform 0.01)
+   (image :initform "wumpus_hunter.png")
+   (kick-clock :initform 0)
+   (color :initform "red")
+   (speed :initform 0)
+   (count :initform 0)
+   (last-collision :initform nil :accessor last-collision)))
+
 
 
 
@@ -223,9 +230,9 @@
 ;; each game loop.
 
 
-(defmethod update ((wumpus-sprite wumpus-sprite))
-  (with-slots (heading speed) wumpus-sprite
-    (move wumpus-sprite heading speed)))
+(defmethod update ((wumpus-hunter-sprite wumpus-hunter-sprite))
+  (with-slots (heading speed) wumpus-hunter-sprite
+    (move wumpus-hunter-sprite heading speed)))
 
 
 
@@ -243,25 +250,32 @@
 ;; ball.
 ;; cops
 (defclass city-node (node)
-  ((color :initform "gray")))
+  ((color :initform "gray")
+   (image :initform "city-node.png")))
 
 (defclass wumpus (node)
-  ((color :initform "white")))
+  ((color :initform "white")
+   (image :initform "wumpus.png")))
 
 (defclass blood (node)
-  ((color :initform "red")))
+  ((color :initform "red")
+   (image :initform "blood.png")))
 
 (defclass cops (node)
-  ((color :initform "blue")))
+  ((color :initform "blue")
+    (image :initform "cops.png")))
 
 (defclass sirens (node)
-  ((color :initform "cyan")))
+  ((color :initform "cyan")
+   (image :initform "sirens.png")))
 
 (defclass glowworm (node)
-  ((color :initform "hot pink")))
+  ((color :initform "hot pink")
+   (image :initform "glow-worm.png")))
 
 (defclass lights (node)
-  ((color :initform "pink")))
+  ((color :initform "pink")
+   (image :initform "lights.png")))
 
 (defclass wall (node)
    ((color :initform "gray50")))
@@ -278,10 +292,10 @@
 ;; collide during that frame.
    
 
-(defmethod collide ((wumpus-sprite wumpus-sprite) (wall wall))
-  (with-slots (heading speed x y) wumpus-sprite
+(defmethod collide ((wumpus-hunter-sprite wumpus-hunter-sprite) (wall wall))
+  (with-slots (heading speed x y) wumpus-hunter-sprite
      ;; back away from wall
-    (move wumpus-sprite (opposite-heading heading) speed)
+    (move wumpus-hunter-sprite (opposite-heading heading) speed)
     ;; sometimes choose another direction to prevent getting stuck
     (percent-of-time 10 (incf heading (radian-angle 90)))))
 
@@ -293,10 +307,9 @@
 
 (xelf:defresource "bip.wav" :volume 20)
 
-(defmethod collide :after((wumpus-sprite wumpus-sprite) (node node))
-  (play-sample "bip.wav"))
+(defmethod collide :after((wumpus-hunter-sprite wumpus-hunter-sprite) (node node)))
 
-(defun  wumpus-sprite () (slot-value (current-buffer) 'wumpus-sprite))
+(defun  wumpus-hunter-sprite () (slot-value (current-buffer) 'wumpus-hunter-sprite))
 ;; See also:
 
 ;;  - [[file:dictionary/KEYBOARD-DOWN-P.html][KEYBOARD-DOWN-P]]
@@ -374,7 +387,7 @@
 
 (defun insert-objects (x y objects)
   "Inserts objects starting from x,y"
-  (let ((counter 4))
+  (let ((counter 10))
       (dolist (obj objects)
         (let* ((xo (+ x  counter))
                (yo (+ y  counter)))
@@ -397,7 +410,7 @@
 
 (defun populate-city (city-nodes)
   (with-new-buffer
-    (dolist (node city-nodes)
+    (dolist (node city-nodes)g
       (let ((x (get-x (car node)))
             (y (get-y (car node)))
             (objects (rest node)))
@@ -427,7 +440,7 @@
 
 
 (defclass wumpus-world (buffer)
-   ((wumpus-sprite :initform (make-instance 'wumpus-sprite))
+   ((wumpus-hunter-sprite :initform (make-instance 'wumpus-hunter-sprite))
     (background-color :initform "orange")
     (width :initform *width*)
     (height :initform *height*)))
@@ -448,11 +461,10 @@
 
 
 (defmethod start-game ((wumpus-world  wumpus-world))
-  (with-slots ( wumpus-sprite) wumpus-world
+  (with-slots ( wumpus-hunter-sprite) wumpus-world
     (with-buffer wumpus-world
       (new-game)
-      (insert  wumpus-sprite)
-      (move-to wumpus-sprite 80 120)
+      (insert  wumpus-hunter-sprite)
       (paste-from wumpus-world (make-border 0 0 (- *width* (units 1)) (- *height* (units 1))))
       (paste-from wumpus-world (populate-city *congestion-city-nodes*))
        )))
