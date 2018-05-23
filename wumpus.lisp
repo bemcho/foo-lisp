@@ -202,16 +202,18 @@
 (defparameter *width* 1024)
 (defparameter *height* 720)
 (defparameter *city-node-size* (units 4))
-(defparameter *space-btw-nodes* (units 2))
+(defparameter *space-btw-nodes* (units 4))
 (defparameter *node-offset* (+ *city-node-size* *space-btw-nodes*))
 (defparameter *objects-size* (units 1))
 (defparameter *x-max-objects* (floor *width* *space-btw-nodes*))
 (defparameter *y-max-objects* (floor *height* *city-node-size*))
 
+
 (defclass wumpus-sprite (node)
    ((height :initform (units 1))
     (width :initform (units 1))
-    (color :initform "pink")
+    (color :initform "dark orchid")
+    (image :initform "wumpus.png")
     (speed :initform 1)
     (heading :initform (direction-heading :downright))))
 
@@ -241,10 +243,10 @@
 ;; ball.
 ;; cops
 (defclass city-node (node)
-  ((color :initform "dark orchid")))
+  ((color :initform "gray")))
 
 (defclass wumpus (node)
-  ((color :initform "black")))
+  ((color :initform "white")))
 
 (defclass blood (node)
   ((color :initform "red")))
@@ -380,15 +382,15 @@
           (setf counter (+ counter *objects-size*))))))
 
 (defun get-x (node-pos)
-  "doc"
-  (let ((new-x  (+ (* (random *x-max-objects*) node-pos) *node-offset* )))
+  "gets X coordinate within screen size"
+  (let ((new-x (* node-pos (random *width*))))
     (if (<= (+ new-x *node-offset*) *width*)
         new-x
         (get-x node-pos))))
 
 (defun get-y (node-pos)
-  "doc"
-  (let ((new-y  (+ (* (random *y-max-objects*) node-pos) *node-offset* )))
+  "gets Y coordinate within screen size"
+  (let ((new-y (* node-pos (random *height*))))
     (if (<= (+ new-y *node-offset*) *height*)
         new-y
         (get-y node-pos))))
@@ -399,9 +401,9 @@
       (let ((x (get-x (car node)))
             (y (get-y (car node)))
             (objects (rest node)))
-            (insert (make-object x y *city-node-size* *city-node-size* 'city-node))
-            (and objects (insert-objects x y objects))))
-       (current-buffer)))
+        (insert (make-object x y *city-node-size* *city-node-size* 'city-node))
+        (and objects (insert-objects x y objects))))
+    (current-buffer)))
 
 ;; See also [[file:dictionary/INSERT.html][INSERT]] and [[file:dictionary/CURRENT-BUFFER.html][CURRENT-BUFFER]].
 
@@ -426,7 +428,7 @@
 
 (defclass wumpus-world (buffer)
    ((wumpus-sprite :initform (make-instance 'wumpus-sprite))
-    (background-color :initform "black")
+    (background-color :initform "orange")
     (width :initform *width*)
     (height :initform *height*)))
 
@@ -465,19 +467,23 @@
 (defun wumpus-game ()
   ;; Configure the screen dimensions
   (setf *window-title* "Grand Theft Wumpus")
-   (setf *screen-height* *height*)
-   (setf *screen-width* *width*)
-   ;; Allow resizing of window and scaling
-   (setf *resizable* t)
-   (setf *scale-output-to-window* t)
-   (with-session
-     (open-project :foo-lisp)
+  (setf *font* "sans-11")
+  (setf *frame-rate* 60)
+  (setf *font-texture-scale* 1)
+  (setf *font-texture-filter* :linear)
+  (setf *screen-width* *width*)
+  (setf *screen-height* *height*)
+  ;; Allow resizing of window and scaling
+  (setf *resizable* t)
+  (setf *scale-output-to-window* t)
+  (with-session  
+    (open-project :foo-lisp)
      ;; this indexes everything defined with DEFRESOURCE
-     (index-all-images)
-     (index-all-samples)
-     (index-pending-resources)
-     (preload-resources)
-     (let ((wumpus-world (make-instance 'wumpus-world)))
-       ;; start the buffer running
-       (switch-to-buffer wumpus-world)
-       (start-game wumpus-world))))
+    (index-all-images)
+    (index-all-samples)
+    (index-pending-resources)
+    (preload-resources)
+    (let ((wumpus-world (make-instance 'wumpus-world)))
+      ;; start the buffer running
+      (switch-to-buffer wumpus-world)
+      (start-game wumpus-world))))

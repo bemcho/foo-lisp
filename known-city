@@ -1,6 +1,6 @@
 graph{
-21[label="(21 *)"];
-13[label="(13 FOO-LISP::?)"];
-20[label="(20 FOO-LISP::?)"];
-21--13[label=""];
-21--20[label=""];}
+12[label="(12 *)"];
+5[label="(5 FOO-LISP::?)"];
+2[label="(2 FOO-LISP::?)"];
+12--5[label=""];
+12--2[label=""];}
