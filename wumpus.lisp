@@ -386,19 +386,25 @@
         ((eql wumpus-city-symbol 'GLOW-WORM) 'glowworm)
         ((eql wumpus-city-symbol 'COPS) 'cops)
         ))
-(defun get-next-x-or-y (x-or-y step)
+(defun get-next-x (x step)
   "doc"
-  (let ((next (+ x-or-y step)))
-    (if (> (- next x-or-y) *city-node-size*) x-or-y next)))
+  (cond  ((or (= step 0) (= step 2)) x)
+         ((or (=  step 1) (= step 3)) (+ (- *city-node-size* (* *padding-inside-node* 2) *objects-size*) x))))
+
+  (defun get-next-y (y step)
+  "doc"
+   (cond  ((or (= step 0) (= step 1)) y)
+         ((or (=  step 2) (= step 3)) (+ (- *city-node-size* (* *padding-inside-node* 2) *objects-size*) y))))
+
 
 (defun insert-objects (x y objects)
   "Inserts objects starting from x,y"
-  (let ((counter *padding-inside-node*))
+  (let ((counter 0))
       (dolist (obj objects)
-        (let* ((xo (get-next-x-or-y x counter))
-               (yo (get-next-x-or-y y counter)))
+        (let* ((xo (get-next-x (+ x *padding-inside-node*) counter))
+               (yo (get-next-y (+ y *padding-inside-node*) counter)))
           (insert (make-object xo yo  *objects-size*  *objects-size* (get-class-for obj)))
-          (setf counter (+ counter *objects-size*))))))
+          (incf counter)))))
 
 (defun get-x (node-pos)
   "gets X coordinate within screen size"
