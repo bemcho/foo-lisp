@@ -210,13 +210,20 @@
 (defparameter *x-max-objects* (floor *width* *space-btw-nodes*))
 (defparameter *y-max-objects* (floor *height* *city-node-size*))
 
+(defparameter *node-to-coordinates-map* (make-hash-table :test 'equal))
+(defun  node-pos-to-node(pos)
+  "doc"
+  (gethash pos *node-to-coordinates-map*))
+
+(defun set-node-mapping (pos node)
+  "doc"
+  (setf (gethash pos *node-to-coordinates-map*) node))
 
 (defclass wumpus-hunter-sprite (node)
   ((height :initform (units 2))
    (width :initform (units 2))
    (max-dx :initform 100)
    (max-dy :initform 100)
-   (max-ddx :initform 0.01)
    (max-ddy :initform 0.01)
    (image :initform "wumpus_hunter.png")
    (kick-clock :initform 0)
@@ -390,6 +397,7 @@
         ((eql wumpus-city-symbol 'GLOW-WORM) 'glowworm)
         ((eql wumpus-city-symbol 'COPS) 'cops)
         ))
+
 (defun get-next-x (x step)
   "doc"
   (cond  ((or (= step 0) (= step 2)) x)
@@ -433,21 +441,10 @@
             (objects (rest node))
             (current-node (make-object x y *city-node-size* *city-node-size* 'city-node)))
         (setf (node-number current-node) node-pos)
+        (set-node-mapping node-pos current-node)
         (insert current-node)
         (and objects (insert-objects x y objects))))
     (current-buffer)))
-
-;; See also [[file:dictionary/INSERT.html][INSERT]] and [[file:dictionary/CURRENT-BUFFER.html][CURRENT-BUFFER]].
-
-;; Now it's time for pretty rows of colored bricks.
-
-
-(defparameter *row-colors* 
-   '("dark orchid" "medium orchid" "orchid" "dark orange" "orange" "gold"))
-
- (defun row-color (row)
-   (nth (mod row (length *row-colors*))
-        *row-colors*))
 
  ;; See also [[file:dictionary/ADD-NODE.html][ADD-NODE]].
 
