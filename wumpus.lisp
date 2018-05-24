@@ -253,7 +253,11 @@
 ;; cops
 (defclass city-node (node)
   ((color :initform "gray")
-   (image :initform "city-node.png")))
+   (image :initform "city-node.png")
+   (node-number
+    :reader node-number
+    :writer (setf node-number)
+    :initform 0)))
 
 (defclass wumpus (node)
   ((color :initform "white")
@@ -284,10 +288,10 @@
 
 ;;
 (defun make-object (x y width height object-type)
-  (let ((obj (make-instance object-type)))
+  (let*((obj (make-instance object-type)))
     (resize obj width height)
     (move-to obj x y)
-    obj))
+     obj))
 
 ;; We want the ball to bounce off of the walls. The [[file:dictionary/COLLIDE.html][COLLIDE]] method is
 ;; called for every frame on all pairs of objects whose bounding boxes
@@ -422,11 +426,14 @@
 
 (defun populate-city (city-nodes)
   (with-new-buffer
-    (dolist (node city-nodes)g
-      (let ((x (get-x (car node)))
-            (y (get-y (car node)))
-            (objects (rest node)))
-        (insert (make-object x y *city-node-size* *city-node-size* 'city-node))
+    (dolist (node city-nodes)
+      (let*((node-pos (car node))
+            (x (get-x node-pos))
+            (y (get-y node-pos))
+            (objects (rest node))
+            (current-node (make-object x y *city-node-size* *city-node-size* 'city-node)))
+        (setf (node-number current-node) node-pos)
+        (insert current-node)
         (and objects (insert-objects x y objects))))
     (current-buffer)))
 
