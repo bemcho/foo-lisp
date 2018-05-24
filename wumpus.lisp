@@ -201,10 +201,12 @@
 
 (defparameter *width* 1024)
 (defparameter *height* 720)
-(defparameter *city-node-size* (units 6))
+(defparameter *city-node-size* (units 8))
 (defparameter *space-btw-nodes* (units 4))
+(defparameter  *padding-inside-node* 15)
+
 (defparameter *node-offset* (+ *city-node-size* *space-btw-nodes*))
-(defparameter *objects-size* (units 1))
+(defparameter *objects-size* (units 2))
 (defparameter *x-max-objects* (floor *width* *space-btw-nodes*))
 (defparameter *y-max-objects* (floor *height* *city-node-size*))
 
@@ -384,13 +386,17 @@
         ((eql wumpus-city-symbol 'GLOW-WORM) 'glowworm)
         ((eql wumpus-city-symbol 'COPS) 'cops)
         ))
+(defun get-next-x-or-y (x-or-y step)
+  "doc"
+  (let ((next (+ x-or-y step)))
+    (if (> (- next x-or-y) *city-node-size*) x-or-y next)))
 
 (defun insert-objects (x y objects)
   "Inserts objects starting from x,y"
-  (let ((counter 10))
+  (let ((counter *padding-inside-node*))
       (dolist (obj objects)
-        (let* ((xo (+ x  counter))
-               (yo (+ y  counter)))
+        (let* ((xo (get-next-x-or-y x counter))
+               (yo (get-next-x-or-y y counter)))
           (insert (make-object xo yo  *objects-size*  *objects-size* (get-class-for obj)))
           (setf counter (+ counter *objects-size*))))))
 
