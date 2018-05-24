@@ -10,44 +10,44 @@
 (defparameter *cop-odds* 15)
 
 (defun random-node ()
-    (1+ (random *node-num*)))
+  (1+ (random *node-num*)))
 
 (defun edge-pair (a b)
-    (unless (eql a b)
-        (list (cons a b) (cons b a))))
+  (unless (eql a b)
+    (list (cons a b) (cons b a))))
 
 (defun make-edge-list ()
-    (apply #'append (loop repeat *edge-num*
-                          collect (edge-pair (random-node) (random-node)))))
+  (apply #'append (loop repeat *edge-num*
+                     collect (edge-pair (random-node) (random-node)))))
 
 (defun direct-edges (node edge-list)
-    (remove-if-not (lambda (x) (eql (car x) node))
-                   edge-list))
+  (remove-if-not (lambda (x) (eql (car x) node))
+                 edge-list))
 
 (defun get-connected (node edge-list)
-    (let ((visited nil))
-         (labels ((traverse (node)
-                      (unless (member node visited)
-                          (push node visited)
-                          (mapc (lambda (edge) (traverse (cdr edge)))
-                                (direct-edges node edge-list)))))
-                 (traverse node))
+  (let ((visited nil))
+    (labels ((traverse (node)
+               (unless (member node visited)
+                 (push node visited)
+                 (mapc (lambda (edge) (traverse (cdr edge)))
+                       (direct-edges node edge-list)))))
+      (traverse node))
     visited))
 
 (defun find-islands (nodes edge-list)
-    (let ((islands nil))
-         (labels ((find-island (nodes)
-                      (let* ((connected (get-connected (car nodes) edge-list))
-                             (unconnected (set-difference nodes connected)))
-                          (push connected islands)
-                          (when unconnected (find-island unconnected)))))
-                 (find-island nodes))
+  (let ((islands nil))
+    (labels ((find-island (nodes)
+               (let* ((connected (get-connected (car nodes) edge-list))
+                      (unconnected (set-difference nodes connected)))
+                 (push connected islands)
+                 (when unconnected (find-island unconnected)))))
+      (find-island nodes))
     islands))
 
 (defun connect-with-bridges (islands)
-    (when (cdr islands)
-        (append (edge-pair (caar islands) (caadr islands))
-                (connect-with-bridges (cdr islands)))))
+  (when (cdr islands)
+    (append (edge-pair (caar islands) (caadr islands))
+            (connect-with-bridges (cdr islands)))))
 
 (defun connect-all-islands (nodes edge-list)
   (append (connect-with-bridges (find-islands nodes edge-list)) edge-list))
@@ -62,8 +62,8 @@
 (defun edges-to-alist (edge-list)
   (mapcar (lambda (node1)
             (cons node1 (mapcar (lambda (edge) (list (cdr edge)))
-                          (remove-duplicates (direct-edges node1 edge-list) :test #'equal))))
-    (remove-duplicates (mapcar #'car edge-list))))
+                                (remove-duplicates (direct-edges node1 edge-list) :test #'equal))))
+          (remove-duplicates (mapcar #'car edge-list))))
 
 (defun add-cops (edge-alist edges-with-cops)
   (mapcar (lambda (x)
@@ -96,14 +96,14 @@
 (defun make-city-nodes (edge-alist)
   (let ((wumpus (random-node))
         (glow-worms (loop for i below *worm-num* collect (random-node))))
-       (loop for n from 1 to *node-num*
-             collect (append (list n)
-                             (cond ((eql n wumpus) '(wumpus))
-                                   ((within-two n wumpus edge-alist) '(blood!)))
-                             (cond ((member n glow-worms) '(glow-worm))
-                                   ((some (lambda (worm) (within-one n worm edge-alist)) glow-worms)
-                                    '(lights!)))
-                             (when (some #'cdr (cdr (assoc n edge-alist))) '(sirens!))))))
+    (loop for n from 1 to *node-num*
+       collect (append (list n)
+                       (cond ((eql n wumpus) '(wumpus))
+                             ((within-two n wumpus edge-alist) '(blood!)))
+                       (cond ((member n glow-worms) '(glow-worm))
+                             ((some (lambda (worm) (within-one n worm edge-alist)) glow-worms)
+                              '(lights!)))
+                       (when (some #'cdr (cdr (assoc n edge-alist))) '(sirens!))))))
 
 (defun new-game ()
   (setf *congestion-city-edges* (make-city-edges))
@@ -115,9 +115,9 @@
 
 (defun find-empty-node ()
   (let ((x (random-node)))
-       (if (cdr (assoc x *congestion-city-nodes*))
-           (find-empty-node)
-           x)))
+    (if (cdr (assoc x *congestion-city-nodes*))
+        (find-empty-node)
+        x)))
 
 (defun draw-city ()
   (ugraph->png "city" *congestion-city-nodes* *congestion-city-edges*))
@@ -127,15 +127,15 @@
   (mapcar (lambda (node)
             (if (member node *visited-nodes*)
                 (let ((n (assoc node *congestion-city-nodes*)))
-                     (if (eql node *player-pos*)
-                         (append n '(*))
-                         n))
+                  (if (eql node *player-pos*)
+                      (append n '(*))
+                      n))
                 (list node '?)))
           (remove-duplicates (append *visited-nodes*
                                      (mapcan (lambda (node)
                                                (mapcar #'car (cdr (assoc node *congestion-city-edges*))))
                                              *visited-nodes*)))))
-; Why not use neighbour function instead of last lambda?
+                                        ; Why not use neighbour function instead of last lambda?
 
 (defun known-city-edges ()
   (mapcar (lambda (node)
@@ -158,9 +158,9 @@
 
 (defun handle-direction (pos charging)
   (let ((edge (assoc pos (cdr (assoc *player-pos* *congestion-city-edges*)))))
-       (if edge
-           (handle-new-place edge pos charging)
-           (princ "That location does not exist!"))))
+    (if edge
+        (handle-new-place edge pos charging)
+        (princ "That location does not exist!"))))
 
 (defun handle-new-place (edge pos charging)
   (let* ((node (assoc pos *congestion-city-nodes*))
@@ -199,8 +199,8 @@
 (defparameter *unit* 10)
 (defun units (n) (* *unit* n))
 
-(defparameter *width* 1024)
-(defparameter *height* 720)
+(defparameter *width* 1800)
+(defparameter *height* 950)
 (defparameter *city-node-size* (units 8))
 (defparameter *space-btw-nodes* (units 4))
 (defparameter  *padding-inside-node* 15)
@@ -265,7 +265,7 @@
         (top y)
         (right (+ x width))
         (bottom (+ y height)))
-;;code goes here
+    ;;code goes here
     )
   )
 ;; Now we need walls around the game world in order to contain the
@@ -274,6 +274,7 @@
 (defclass city-node (node)
   ((color :initform "gray")
    (image :initform "city-node.png")
+   (caption :initform "Somewhere in the city pos: ")
    (node-number
     :reader node-number
     :writer (setf node-number)
@@ -281,46 +282,52 @@
 
 (defclass wumpus (node)
   ((color :initform "white")
+   (caption :initform "Wumpus")
    (image :initform "wumpus.png")))
 
 (defclass blood (node)
   ((color :initform "red")
+   (caption :initform "Blood")
    (image :initform "blood.png")))
 
 (defclass cops (node)
   ((color :initform "blue")
-    (image :initform "cops.png")))
+   (caption :initform "COPS")
+   (image :initform "cops.png")))
 
 (defclass sirens (node)
   ((color :initform "cyan")
+   (caption :initform "Sirens")
    (image :initform "sirens.png")))
 
 (defclass glowworm (node)
   ((color :initform "hot pink")
+   (caption :initform "Glow Worm, ooo maan")
    (image :initform "glow-worm.png")))
 
 (defclass lights (node)
   ((color :initform "pink")
+   (caption :initform "Lights of glow worm nearby")
    (image :initform "lights.png")))
 
 (defclass wall (node)
-   ((color :initform "gray50")))
+  ((color :initform "gray50")))
 
 ;;
 (defun make-object (x y width height object-type)
   (let*((obj (make-instance object-type)))
     (resize obj width height)
     (move-to obj x y)
-     obj))
+    obj))
 
 ;; We want the ball to bounce off of the walls. The [[file:dictionary/COLLIDE.html][COLLIDE]] method is
 ;; called for every frame on all pairs of objects whose bounding boxes
 ;; collide during that frame.
-   
+
 
 (defmethod collide ((wumpus-hunter-sprite wumpus-hunter-sprite) (wall wall))
   (with-slots (heading speed x y) wumpus-hunter-sprite
-     ;; back away from wall
+    ;; back away from wall
     (move wumpus-hunter-sprite (opposite-heading heading) speed)
     ;; sometimes choose another direction to prevent getting stuck
     (percent-of-time 10 (incf heading (radian-angle 90)))))
@@ -355,12 +362,12 @@
 
 
 (defun make-wall (x y width height)
-   (let ((wall (make-instance 'wall)))
-     (resize wall width height)
-     (move-to wall x y)
-     wall))
+  (let ((wall (make-instance 'wall)))
+    (resize wall width height)
+    (move-to wall x y)
+    wall))
 
- 
+
 
 ;; See also [[file:dictionary/MOVE-TO.html][MOVE-TO]], [[file:dictionary/RESIZE.html][RESIZE]].
 
@@ -373,15 +380,15 @@
         (right (+ x width))
         (bottom (+ y height)))
     (with-new-buffer
-       ;; top wall
+      ;; top wall
       (insert (make-wall left top (- right left) (units 1)))
-       ;; bottom wall
+      ;; bottom wall
       (insert (make-wall left bottom (- right left (units -1)) (units 1)))
-       ;; left wall
+      ;; left wall
       (insert (make-wall left top (units 1) (- bottom top)))
-       ;; right wall
+      ;; right wall
       (insert (make-wall right top (units 1) (- bottom top (units -1))))
-       ;; send it all back
+      ;; send it all back
       (current-buffer))))
 
 (defun make-border (x y width height)
@@ -390,15 +397,15 @@
         (right (+ x width))
         (bottom (+ y height)))
     (with-new-buffer
-       ;; top wall
+      ;; top wall
       (insert (make-wall left top (- right left) (units 1)))
-       ;; bottom wall
+      ;; bottom wall
       (insert (make-wall left bottom (- right left (units -1)) (units 1)))
-       ;; left wall
+      ;; left wall
       (insert (make-wall left top (units 1) (- bottom top)))
-       ;; right wall
+      ;; right wall
       (insert (make-wall right top (units 1) (- bottom top (units -1))))
-       ;; send it all back
+      ;; send it all back
       (current-buffer))))
 
 (defun get-class-for (wumpus-city-symbol)
@@ -416,20 +423,20 @@
   (cond  ((or (= step 0) (= step 2)) x)
          ((or (=  step 1) (= step 3)) (+ (- *city-node-size* (* *padding-inside-node* 2) *objects-size*) x))))
 
-  (defun get-next-y (y step)
+(defun get-next-y (y step)
   "doc"
-   (cond  ((or (= step 0) (= step 1)) y)
+  (cond  ((or (= step 0) (= step 1)) y)
          ((or (=  step 2) (= step 3)) (+ (- *city-node-size* (* *padding-inside-node* 2) *objects-size*) y))))
 
 
 (defun insert-objects (x y objects)
   "Inserts objects starting from x,y"
   (let ((counter 0))
-      (dolist (obj objects)
-        (let* ((xo (get-next-x (+ x *padding-inside-node*) counter))
-               (yo (get-next-y (+ y *padding-inside-node*) counter)))
-          (insert (make-object xo yo  *objects-size*  *objects-size* (get-class-for obj)))
-          (incf counter)))))
+    (dolist (obj objects)
+      (let* ((xo (get-next-x (+ x *padding-inside-node*) counter))
+             (yo (get-next-y (+ y *padding-inside-node*) counter)))
+        (insert (make-object xo yo  *objects-size*  *objects-size* (get-class-for obj)))
+        (incf counter)))))
 
 (defun get-x (node-pos)
   "gets X coordinate within screen size"
@@ -459,7 +466,7 @@
         (and objects (insert-objects x y objects))))
     (current-buffer)))
 
- ;; See also [[file:dictionary/ADD-NODE.html][ADD-NODE]].
+;; See also [[file:dictionary/ADD-NODE.html][ADD-NODE]].
 
 ;; You can see that MAKE-PUZZLE also returns a new buffer. We'll put
 ;; together these component buffers into the final game board below
@@ -469,10 +476,10 @@
 
 
 (defclass wumpus-world (buffer)
-   ((wumpus-hunter-sprite :initform (make-instance 'wumpus-hunter-sprite))
-    (background-color :initform "orange")
-    (width :initform *width*)
-    (height :initform *height*)))
+  ((wumpus-hunter-sprite :initform (make-instance 'wumpus-hunter-sprite))
+   (background-color :initform "orange")
+   (width :initform *width*)
+   (height :initform *height*)))
 
 
 
@@ -520,7 +527,7 @@
   (setf *scale-output-to-window* t)
   (with-session  
     (open-project :foo-lisp)
-     ;; this indexes everything defined with DEFRESOURCE
+    ;; this indexes everything defined with DEFRESOURCE
     (index-all-images)
     (index-all-samples)
     (index-pending-resources)
