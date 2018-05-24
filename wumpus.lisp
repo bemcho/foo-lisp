@@ -211,13 +211,25 @@
 (defparameter *y-max-objects* (floor *height* *city-node-size*))
 
 (defparameter *node-to-coordinates-map* (make-hash-table :test 'equal))
+
 (defun  node-pos-to-node(pos)
   "doc"
-  (gethash pos *node-to-coordinates-map*))
+  (multiple-value-bind (node found)
+      (gethash pos *node-to-coordinates-map*)
+    node))
 
 (defun set-node-mapping (pos node)
   "doc"
   (setf (gethash pos *node-to-coordinates-map*) node))
+
+(defun get-wumpus-hunter-node ()
+  "doc"
+  (node-pos-to-node (car *visited-nodes*)))
+
+(defun move-node-to (node node-pos)
+  "doc"
+  (let ((wumpus-node (node-pos-to-node node-pos)))
+    (move-to node (+ (x wumpus-node) (floor *city-node-size* 2)) (+ (y wumpus-node) (floor *city-node-size* 2)))))
 
 (defclass wumpus-hunter-sprite (node)
   ((height :initform (units 2))
@@ -241,7 +253,8 @@
 
 (defmethod update ((wumpus-hunter-sprite wumpus-hunter-sprite))
   (with-slots (heading speed) wumpus-hunter-sprite
-    (move wumpus-hunter-sprite heading speed)))
+    (let ((node-pos (+ (random (length *congestion-city-nodes*)) 1)))
+      (move-node-to wumpus-hunter-sprite node-pos))))
 
 
 
@@ -477,13 +490,14 @@
 
 
 (defmethod start-game ((wumpus-world  wumpus-world))
-  (with-slots ( wumpus-hunter-sprite) wumpus-world
+  (with-slots (wumpus-hunter-sprite) wumpus-world
     (with-buffer wumpus-world
       (new-game)
-      (insert  wumpus-hunter-sprite)
       (paste-from wumpus-world (make-border 0 0 (- *width* (units 1)) (- *height* (units 1))))
       (paste-from wumpus-world (populate-city *congestion-city-nodes*))
-       )))
+      (insert  wumpus-hunter-sprite)
+      (let ((current-node (get-wumpus-hunter-node)))
+        (move-node-to wumpus-hunter-sprite (node-number current-node))))))
 
 
 
@@ -496,7 +510,7 @@
   ;; Configure the screen dimensions
   (setf *window-title* "Grand Theft Wumpus")
   (setf *font* "sans-11")
-  (setf *frame-rate* 60)
+  (setf *frame-rate* 1)
   (setf *font-texture-scale* 1)
   (setf *font-texture-filter* :linear)
   (setf *screen-width* *width*)
