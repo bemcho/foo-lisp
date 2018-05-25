@@ -1,0 +1,6 @@
+graph{
+8[label="(8 *)"];
+4[label="(4 FOO-LISP::?)"];
+17[label="(17 FOO-LISP::?)"];
+8--4[label=""];
+8--17[label=""];}

@@ -1,4 +1,0 @@
-graph{
-29[label="(29 *)"];
-5[label="(5 FOO-LISP::?)"];
-29--5[label=""];}

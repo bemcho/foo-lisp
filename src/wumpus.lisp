@@ -120,7 +120,7 @@
         x)))
 
 (defun draw-city ()
-  (ugraph->png "city" *congestion-city-nodes* *congestion-city-edges*))
+  (ugraph->png "../generated/city" *congestion-city-nodes* *congestion-city-edges*))
 
 
 (defun known-city-nodes ()
@@ -147,7 +147,7 @@
           *visited-nodes*))
 
 (defun draw-known-city ()
-  (ugraph->png "known-city" (known-city-nodes) (known-city-edges)))
+  (ugraph->png "../generated/known-city" (known-city-nodes) (known-city-edges)))
 
 
 (defun walk (pos)
@@ -186,7 +186,7 @@
 ;; Common Lisp packages
 
 ;; Then we must define a Common Lisp "package" for our game's code to
-;; inhabit.
+;; inhabi.
 
 
 ;; Configuring your space 
@@ -308,8 +308,6 @@
 ;; The ball should emit a retro beep when colliding with any node. We
 ;; use [[file:dictionary/DEFRESOURCE.html][DEFRESOURCE]] to let Xelf know about the sound file. 
 
-
-(xelf:defresource "bip.wav" :volume 20)
 
 (defmethod collide :after((wumpus-hunter-sprite wumpus-hunter-sprite) (node node)))
 
@@ -438,12 +436,15 @@
   (setf *font-texture-filter* :linear)
   (setf *screen-width* *width*)
   (setf *screen-height* *height*)
+  (setf *user-projects-directory*  "/static/")
   ;; Allow resizing of window and scaling
   (setf *resizable* t)
   (setf *scale-output-to-window* t)
   (with-session  
     (open-project :foo-lisp)
     ;; this indexes everything defined with DEFRESOURCE
+    (index-all-images)
+    (setf *project-path* (merge-pathnames "static/" *project-path*))
     (index-all-images)
     (index-all-samples)
     (index-pending-resources)
