@@ -243,10 +243,10 @@
 (defun get-nth-grid-box-coord (grid-pos)
   "doc"
   (multiple-value-bind (y-step x-step)
-      (floor(-  grid-pos 1) *grid-max-row-cols*)
-    (list 
-     (+ (* *grid-width* x-step) *space-btw-nodes*)
-     (+ (* *grid-height* y-step) *space-btw-nodes*))))
+      (floor (- grid-pos 1) *grid-max-row-cols*)
+    (values 
+     (+ (* *grid-width* x-step) (if (zerop x-step) 15 *space-btw-nodes*))
+     (+ (* *grid-height* y-step) (if (zerop y-step) 15 *space-btw-nodes*)))))
 
 
 
@@ -330,7 +330,8 @@
    (image :initform "lights.png")))
 
 (defclass wall (node)
-  ((color :initform "gray50")))
+  ((color :initform "gray50")
+   (image :initform "wall.png")))
 
 ;;
 (defun make-object (x y width height object-type)
@@ -389,44 +390,6 @@
 
 
 ;; See also [[file:dictionary/MOVE-TO.html][MOVE-TO]], [[file:dictionary/RESIZE.html][RESIZE]].
-
-;; This function MAKE-BORDER returns a buffer with four walls.
-
-
-(defun make-border (x y width height)
-  (let ((left x)
-        (top y)
-        (right (+ x width))
-        (bottom (+ y height)))
-    (with-new-buffer
-      ;; top wall
-      (insert (make-wall left top (- right left) (units 1)))
-      ;; bottom wall
-      (insert (make-wall left bottom (- right left (units -1)) (units 1)))
-      ;; left wall
-      (insert (make-wall left top (units 1) (- bottom top)))
-      ;; right wall
-      (insert (make-wall right top (units 1) (- bottom top (units -1))))
-      ;; send it all back
-      (current-buffer))))
-
-(defun make-border (x y width height)
-  (let ((left x)
-        (top y)
-        (right (+ x width))
-        (bottom (+ y height)))
-    (with-new-buffer
-      ;; top wall
-      (insert (make-wall left top (- right left) (units 1)))
-      ;; bottom wall
-      (insert (make-wall left bottom (- right left (units -1)) (units 1)))
-      ;; left wall
-      (insert (make-wall left top (units 1) (- bottom top)))
-      ;; right wall
-      (insert (make-wall right top (units 1) (- bottom top (units -1))))
-      ;; send it all back
-      (current-buffer))))
-
 (defun get-class-for (wumpus-city-symbol)
   "Return class type eg: LIGHTS! -> lights"
   (cond ((eql wumpus-city-symbol 'LIGHTS!) 'lights)
@@ -457,26 +420,24 @@
         (insert (make-object xo yo  *objects-size*  *objects-size* (get-class-for obj)))
         (incf counter)))))
 
-(defun get-x (node-pos)
-  "gets X coordinate within screen size"
-  (car (get-nth-grid-box-coord node-pos)))
-
-(defun get-y (node-pos)
-  "gets Y coordinate within screen size"
-  (cadr (get-nth-grid-box-coord node-pos)))
+(defun draw-city-background ()
+  "doc"
+  (insert (make-object 0 0  *width* *height* 'wall)))
 
 (defun populate-city (city-nodes)
   (with-new-buffer
     (dolist (node city-nodes)
-      (let*((node-pos (car node))
-            (x (get-x node-pos))
-            (y (get-y node-pos))
-            (objects (rest node))
-            (current-node (make-object x y *city-node-size* *city-node-size* 'city-node)))
-        (setf (node-number current-node) node-pos)
-        (set-node-mapping node-pos current-node)
-        (insert current-node)
-        (and objects (insert-objects x y objects))))
+      (multiple-value-bind (grid-x grid-y)
+          (get-nth-grid-box-coord (car node))
+        (let*((node-pos (car node))
+              (objects (rest node))
+              (x (+ grid-x (floor *grid-width* 4)))
+              (y (+ grid-y (floor *grid-width* 4)))
+              (current-node (make-object x y *city-node-size* *city-node-size* 'city-node)))
+          (setf (node-number current-node) node-pos)
+          (set-node-mapping node-pos current-node)
+          (insert current-node)
+          (and objects (insert-objects x y objects)))))
     (current-buffer)))
 
 ;; See also [[file:dictionary/ADD-NODE.html][ADD-NODE]].
@@ -490,7 +451,7 @@
 
 (defclass wumpus-world (buffer)
   ((wumpus-hunter-sprite :initform (make-instance 'wumpus-hunter-sprite))
-   (background-color :initform "orange")
+   (background-color :initform "gray50")
    (width :initform *width*)
    (height :initform *height*)))
 
@@ -516,8 +477,6 @@
       (setf  *grid-max-row-cols* (ceiling  (sqrt 30)))
       (setf *grid-width* (floor *width* *grid-max-row-cols*))
       (setf *grid-height* (floor *height* *grid-max-row-cols*))
-     
-      (paste-from wumpus-world (make-border 0 0 (- *width* (units 1)) (- *height* (units 1))))
       (paste-from wumpus-world (populate-city *congestion-city-nodes*))
       (insert  wumpus-hunter-sprite)
       (let ((current-node (get-wumpus-hunter-node)))
