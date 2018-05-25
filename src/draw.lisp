@@ -78,6 +78,10 @@
   ((color :initform "gray50")
    (image :initform "wall.png")))
 
+(defclass mist (node)
+  ((color :initform "gray50")
+   (image :initform "mist.png")))
+
 ;;
 (defun make-object (x y width height object-type)
   (let*((obj (make-instance object-type)))
@@ -127,9 +131,18 @@
         (insert (make-object xo yo  *objects-size*  *objects-size* (get-class-for obj)))
         (incf counter)))))
 
-(defun draw-city-background ()
+(defun draw-mist-background ()
   "doc"
-  (insert (make-object 0 0  *width* *height* 'wall)))
+  (let ((x-count (floor *width* *city-node-size*))
+        (y-count (floor *height* *city-node-size*))
+        (x 0)
+        (y 0))
+    (dotimes (count-y y-count)
+      (dotimes (count-x x-count)
+        (insert (make-object x y  *city-node-size* *city-node-size* 'mist))
+        (setf x (+ x *city-node-size*)))
+      (setf y (+ y *objects-size*))
+      (setf x 0))))
 
 (defun populate-city (city-nodes)
   (with-new-buffer
@@ -145,4 +158,5 @@
           (grid-utils:set-node-mapping node-pos current-node)
           (insert current-node)
           (and objects (insert-objects x y objects)))))
+    (draw-mist-background)
     (current-buffer)))
