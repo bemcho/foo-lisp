@@ -19,16 +19,16 @@
 
 (defparameter *width* 1800)
 (defparameter *height* 950)
-(defparameter *city-node-size* (units 8))
+(defparameter *city-node-size* (units 15))
 (defparameter *space-btw-nodes* (units 5))
-(defparameter *padding-inside-node* 15)
-(defparameter *objects-size* (units 2) "in pixels")
+(defparameter *padding-inside-node* (units 3))
+(defparameter *objects-size* (units 4) "in pixels")
 
 
 
 (defclass wumpus-hunter-sprite (node)
-  ((height :initform (units 2))
-   (width :initform (units 2))
+  ((height :initform (+ *objects-size* (units 1)))
+   (width :initform (+ *objects-size* (units 1)))
    (max-dx :initform 100)
    (max-dy :initform 100)
    (max-ddy :initform 0.01)

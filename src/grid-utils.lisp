@@ -61,8 +61,8 @@
   "doc"
   (let ((wumpus-node (node-pos-to-node node-pos)))
     (xelf:move-to node
-                  (+ (xelf:x wumpus-node) *half-city-node*)
-                  (+ (xelf:y wumpus-node) *half-city-node*))))
+                  (+ (xelf:x wumpus-node) *half-city-node* *padding-inside-node*)
+                  (+ (xelf:y wumpus-node) *half-city-node* *padding-inside-node*))))
 ;; 2D grid utils
 
 
