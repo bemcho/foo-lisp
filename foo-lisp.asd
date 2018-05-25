@@ -9,6 +9,7 @@
   :components ((:module "src"
                         :components
                         ((:file "package")
+                         (:file "config")
                          (:file "grid-utils")
                          (:file "draw")  
                          (:file "graph-util")

@@ -31,7 +31,6 @@
 
 (defparameter *grid-height*  100 "in pixels")
 
-
 (defun config(width height node-size space-btw-nodes padding-inside-node object-size grid-max-row-cols ref-to-visited-nodes)
   "Call this before using grid if you want to change default config values"
   (setf *width*  width *height* height *city-node-size* node-size *space-btw-nodes* space-btw-nodes  *padding-inside-node*  padding-inside-node *objects-size*
