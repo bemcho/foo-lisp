@@ -210,6 +210,8 @@
 (defparameter *x-max-objects* (floor *width* *space-btw-nodes*))
 (defparameter *y-max-objects* (floor *height* *city-node-size*))
 
+
+
 (defparameter *node-to-coordinates-map* (make-hash-table :test 'equal))
 
 (defun  node-pos-to-node(pos)
@@ -230,6 +232,23 @@
   "doc"
   (let ((wumpus-node (node-pos-to-node node-pos)))
     (move-to node (+ (x wumpus-node) (floor *city-node-size* 2)) (+ (y wumpus-node) (floor *city-node-size* 2)))))
+
+;; 2D grid utils
+(defparameter *grid-width* 100 "doc")
+
+(defparameter *grid-height* 100 "doc")
+
+(defparameter *grid-max-row-cols* 10)
+
+(defun get-nth-grid-box-coord (grid-pos)
+  "doc"
+  (multiple-value-bind (y-step x-step)
+      (floor(-  grid-pos 1) *grid-max-row-cols*)
+    (list 
+     (+ (* *grid-width* x-step) *space-btw-nodes*)
+     (+ (* *grid-height* y-step) *space-btw-nodes*))))
+
+
 
 (defclass wumpus-hunter-sprite (node)
   ((height :initform (units 2))
@@ -440,17 +459,11 @@
 
 (defun get-x (node-pos)
   "gets X coordinate within screen size"
-  (let ((new-x (* node-pos (random *width*))))
-    (if (<= (+ new-x *node-offset*) *width*)
-        new-x
-        (get-x node-pos))))
+  (car (get-nth-grid-box-coord node-pos)))
 
 (defun get-y (node-pos)
   "gets Y coordinate within screen size"
-  (let ((new-y (* node-pos (random *height*))))
-    (if (<= (+ new-y *node-offset*) *height*)
-        new-y
-        (get-y node-pos))))
+  (cadr (get-nth-grid-box-coord node-pos)))
 
 (defun populate-city (city-nodes)
   (with-new-buffer
@@ -500,6 +513,10 @@
   (with-slots (wumpus-hunter-sprite) wumpus-world
     (with-buffer wumpus-world
       (new-game)
+      (setf  *grid-max-row-cols* (ceiling  (sqrt 30)))
+      (setf *grid-width* (floor *width* *grid-max-row-cols*))
+      (setf *grid-height* (floor *height* *grid-max-row-cols*))
+     
       (paste-from wumpus-world (make-border 0 0 (- *width* (units 1)) (- *height* (units 1))))
       (paste-from wumpus-world (populate-city *congestion-city-nodes*))
       (insert  wumpus-hunter-sprite)
@@ -536,3 +553,17 @@
       ;; start the buffer running
       (switch-to-buffer wumpus-world)
       (start-game wumpus-world))))
+
+;;;; Scratch
+
+;;(get-nth-grid-box-coord 6)
+       
+
+
+
+
+
+
+
+
+;;;; End Scratch
