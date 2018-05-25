@@ -202,51 +202,9 @@
 (defparameter *width* 1800)
 (defparameter *height* 950)
 (defparameter *city-node-size* (units 8))
-(defparameter *space-btw-nodes* (units 4))
-(defparameter  *padding-inside-node* 15)
-
-(defparameter *node-offset* (+ *city-node-size* *space-btw-nodes*))
-(defparameter *objects-size* (units 2))
-(defparameter *x-max-objects* (floor *width* *space-btw-nodes*))
-(defparameter *y-max-objects* (floor *height* *city-node-size*))
-
-
-
-(defparameter *node-to-coordinates-map* (make-hash-table :test 'equal))
-
-(defun  node-pos-to-node(pos)
-  "doc"
-  (multiple-value-bind (node found)
-      (gethash pos *node-to-coordinates-map*)
-    node))
-
-(defun set-node-mapping (pos node)
-  "doc"
-  (setf (gethash pos *node-to-coordinates-map*) node))
-
-(defun get-wumpus-hunter-node ()
-  "doc"
-  (node-pos-to-node (car *visited-nodes*)))
-
-(defun move-node-to (node node-pos)
-  "doc"
-  (let ((wumpus-node (node-pos-to-node node-pos)))
-    (move-to node (+ (x wumpus-node) (floor *city-node-size* 2)) (+ (y wumpus-node) (floor *city-node-size* 2)))))
-
-;; 2D grid utils
-(defparameter *grid-width* 100 "doc")
-
-(defparameter *grid-height* 100 "doc")
-
-(defparameter *grid-max-row-cols* 10)
-
-(defun get-nth-grid-box-coord (grid-pos)
-  "doc"
-  (multiple-value-bind (y-step x-step)
-      (floor (- grid-pos 1) *grid-max-row-cols*)
-    (values 
-     (+ (* *grid-width* x-step) (if (zerop x-step) 15 *space-btw-nodes*))
-     (+ (* *grid-height* y-step) (if (zerop y-step) 15 *space-btw-nodes*)))))
+(defparameter *space-btw-nodes* (units 5))
+(defparameter *padding-inside-node* 15)
+(defparameter *objects-size* (units 2) "in pixels")
 
 
 
@@ -273,7 +231,7 @@
 (defmethod update ((wumpus-hunter-sprite wumpus-hunter-sprite))
   (with-slots (heading speed) wumpus-hunter-sprite
     (let ((node-pos (+ (random (length *congestion-city-nodes*)) 1)))
-      (move-node-to wumpus-hunter-sprite node-pos))))
+      (grid-utils:move-node-to wumpus-hunter-sprite node-pos))))
 
 
 
@@ -293,7 +251,6 @@
 (defclass city-node (node)
   ((color :initform "gray")
    (image :initform "city-node.png")
-   (caption :initform "Somewhere in the city pos: ")
    (node-number
     :reader node-number
     :writer (setf node-number)
@@ -301,32 +258,26 @@
 
 (defclass wumpus (node)
   ((color :initform "white")
-   (caption :initform "Wumpus")
    (image :initform "wumpus.png")))
 
 (defclass blood (node)
   ((color :initform "red")
-   (caption :initform "Blood")
    (image :initform "blood.png")))
 
 (defclass cops (node)
   ((color :initform "blue")
-   (caption :initform "COPS")
    (image :initform "cops.png")))
 
 (defclass sirens (node)
   ((color :initform "cyan")
-   (caption :initform "Sirens")
    (image :initform "sirens.png")))
 
 (defclass glowworm (node)
   ((color :initform "hot pink")
-   (caption :initform "Glow Worm, ooo maan")
    (image :initform "glow-worm.png")))
 
 (defclass lights (node)
   ((color :initform "pink")
-   (caption :initform "Lights of glow worm nearby")
    (image :initform "lights.png")))
 
 (defclass wall (node)
@@ -400,23 +351,12 @@
         ((eql wumpus-city-symbol 'COPS) 'cops)
         ))
 
-(defun get-next-x (x step)
-  "doc"
-  (cond  ((or (= step 0) (= step 2)) x)
-         ((or (=  step 1) (= step 3)) (+ (- *city-node-size* (* *padding-inside-node* 2) *objects-size*) x))))
-
-(defun get-next-y (y step)
-  "doc"
-  (cond  ((or (= step 0) (= step 1)) y)
-         ((or (=  step 2) (= step 3)) (+ (- *city-node-size* (* *padding-inside-node* 2) *objects-size*) y))))
-
-
 (defun insert-objects (x y objects)
   "Inserts objects starting from x,y"
   (let ((counter 0))
     (dolist (obj objects)
-      (let* ((xo (get-next-x (+ x *padding-inside-node*) counter))
-             (yo (get-next-y (+ y *padding-inside-node*) counter)))
+      (let* ((xo (grid-utils:get-next-x (+ x *padding-inside-node*) counter))
+             (yo (grid-utils:get-next-y (+ y *padding-inside-node*) counter)))
         (insert (make-object xo yo  *objects-size*  *objects-size* (get-class-for obj)))
         (incf counter)))))
 
@@ -428,14 +368,14 @@
   (with-new-buffer
     (dolist (node city-nodes)
       (multiple-value-bind (grid-x grid-y)
-          (get-nth-grid-box-coord (car node))
+          (grid-utils:get-nth-grid-box-coord (car node))
         (let*((node-pos (car node))
               (objects (rest node))
-              (x (+ grid-x (floor *grid-width* 4)))
-              (y (+ grid-y (floor *grid-width* 4)))
+              (x grid-x)
+              (y grid-y)
               (current-node (make-object x y *city-node-size* *city-node-size* 'city-node)))
           (setf (node-number current-node) node-pos)
-          (set-node-mapping node-pos current-node)
+          (grid-utils:set-node-mapping node-pos current-node)
           (insert current-node)
           (and objects (insert-objects x y objects)))))
     (current-buffer)))
@@ -474,13 +414,13 @@
   (with-slots (wumpus-hunter-sprite) wumpus-world
     (with-buffer wumpus-world
       (new-game)
-      (setf  *grid-max-row-cols* (ceiling  (sqrt 30)))
-      (setf *grid-width* (floor *width* *grid-max-row-cols*))
-      (setf *grid-height* (floor *height* *grid-max-row-cols*))
+      (grid-utils:config *width* *height*
+                         *city-node-size* *space-btw-nodes* *padding-inside-node*
+                         *objects-size* (ceiling  (sqrt (length *congestion-city-nodes*))) *visited-nodes*)
       (paste-from wumpus-world (populate-city *congestion-city-nodes*))
       (insert  wumpus-hunter-sprite)
-      (let ((current-node (get-wumpus-hunter-node)))
-        (move-node-to wumpus-hunter-sprite (node-number current-node))))))
+      (let ((current-node (grid-utils:get-wumpus-hunter-node)))
+        (grid-utils:move-node-to wumpus-hunter-sprite (node-number current-node))))))
 
 
 

@@ -6,8 +6,10 @@
   :license  "Specify license here"
   :version "0.0.1"
   :serial t
-  :depends-on (#:drakma #:cl-csv #:yason #:cl-ana #:inferior-shell #:xelf)
+  :depends-on (#:cl-ana #:inferior-shell #:xelf)
   :components ((:file "package")
+               (:file "grid-utils")
+               (:file "draw")  
                (:file "graph-util")
                (:file "wumpus")
                (:file "foo-lisp")))
