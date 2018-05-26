@@ -1,6 +1,18 @@
 graph{
-26[label="(26 *)"];
-18[label="(18 FOO-LISP::?)"];
-17[label="(17 FOO-LISP::?)"];
-26--18[label=""];
-26--17[label=""];}
+25[label="(25 ?)"];
+11[label="(11)"];
+1[label="(1 ?)"];
+29[label="(29 ?)"];
+21[label="(21 LIGHTS! SIRENS! *)"];
+27[label="(27 ?)"];
+18[label="(18 ?)"];
+24[label="(24 ?)"];
+21--25[label=""];
+21--29[label=""];
+21--24[label=""];
+21--1[label=""];
+11--29[label=""];
+11--21[label=""];
+11--27[label=""];
+11--18[label=""];
+11--24[label=""];}
