@@ -38,7 +38,7 @@
 ;; ball.
 ;; cops
 (defclass city-node (node)
-  ((color :initform "gray")
+  ((color :initform "gray50")
    (image :initform "city-node.png")
    (node-number
     :reader node-number
@@ -78,7 +78,7 @@
    (image :initform "mist.png")))
 
 (defclass cloud (node)
-  ((color :initform "black")
+  ((color :initform "gray50")
    (image :initform "cloud.png")))
 ;;
 (defun make-object (x y width height object-type)
@@ -129,19 +129,11 @@
         (insert (make-object xo yo  *objects-size*  *objects-size* (get-class-for obj)))
         (incf counter)))))
 
-(defun draw-mist-background ()
+(defun draw-mist-background (grid-x grid-y x y)
   "doc"
-  (let ((x-count (floor *width* *city-node-size*))
-        (y-count (floor *height* *city-node-size*))
-        (x 0)
-        (y 0))
-    (dotimes (count-y y-count)
-      (dotimes (count-x x-count)
-        (insert (make-object x y  *city-node-size* *city-node-size* 'mist))
-        (setf x (* count-x *city-node-size*)))
-      (setf y (* count-y *objects-size*))
-      (setf x 0))
-    ))
+ ;; (insert (make-object (- grid-x (* *city-node-size* 2)) (- grid-y (* *city-node-size* 2)) (* *city-node-size*  20) (* *city-node-size* (random 3)) 'cloud))
+  (insert (make-object (- grid-x *city-node-size*) (- grid-y *city-node-size*) (* *city-node-size* 20) (* *city-node-size* (random 3)) 'cloud))
+  (insert (make-object x y (* *city-node-size* 20) (* *city-node-size* 2) 'cloud)))
 
 (defun populate-city (city-nodes)
   (with-new-buffer
@@ -157,9 +149,7 @@
           (grid-utils:set-node-mapping node-pos current-node)
           (insert current-node)
           (and objects (insert-objects x y objects))
-          (insert (make-object (- grid-x (* *city-node-size* 2)) (- grid-y (* *city-node-size* 2)) (* *city-node-size*  4) (* *city-node-size* (random 3)) 'cloud))
-          (insert (make-object (- grid-x *city-node-size*) (- grid-y *city-node-size*) (* *city-node-size* 5) (* *city-node-size* (random 3)) 'cloud))
-          (insert (make-object x y (* *city-node-size* 15) (* *city-node-size* 2) 'cloud))
+          (draw-mist-background grid-x grid-y x y)
           )))
     (current-buffer)))
 
