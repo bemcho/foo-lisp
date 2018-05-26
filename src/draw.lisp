@@ -130,11 +130,15 @@
         (incf counter)))))
 
 (defun draw-mist-background (grid-x grid-y x y)
-  "doc"
- ;; (insert (make-object (- grid-x (* *city-node-size* 2)) (- grid-y (* *city-node-size* 2)) (* *city-node-size*  20) (* *city-node-size* (random 3)) 'cloud))
+  "Draws mist per row" 
   (insert (make-object (- grid-x *city-node-size*) (- grid-y *city-node-size*) (* *city-node-size* 20) (* *city-node-size* (random 3)) 'cloud))
   (insert (make-object x y (* *city-node-size* 20) (* *city-node-size* 2) 'cloud)))
 
+(defun draw-object(x y node objects)
+  "Draws node and its objects"
+   (insert node)
+          (and objects (insert-objects x y objects)))
+  
 (defun populate-city (city-nodes)
   (with-new-buffer
     (dolist (node city-nodes)
@@ -147,8 +151,7 @@
               (current-node (make-object x y *city-node-size* *city-node-size* 'city-node)))
           (setf (node-number current-node) node-pos)
           (grid-utils:set-node-mapping node-pos current-node)
-          (insert current-node)
-          (and objects (insert-objects x y objects))
+          (draw-object x y current-node objects)
           (draw-mist-background grid-x grid-y x y)
           )))
     (current-buffer)))
