@@ -232,7 +232,7 @@
   ;; Configure the screen dimensions
   (setf *window-title* "Grand Theft Wumpus")
   (setf *font* "sans-11")
-  (setf *frame-rate* 60)
+  (setf *frame-rate* 30)
   (setf *font-texture-scale* 1)
   (setf *font-texture-filter* :linear)
   (setf *screen-width* *width*)
@@ -257,7 +257,7 @@
 
 
 ;;;;;;;
-;;(walk 5)
+;;(walk 8)
 ;;(known-city-edges)
 
 
