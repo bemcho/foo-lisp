@@ -1,8 +1,10 @@
 graph{
-15[label="(15 *)"];
+11[label="(11 *)"];
 24[label="(24 FOO-LISP::?)"];
-29[label="(29 FOO-LISP::?)"];
-7[label="(7 FOO-LISP::?)"];
-15--24[label=""];
-15--29[label=""];
-15--7[label=""];}
+12[label="(12 FOO-LISP::?)"];
+22[label="(22 FOO-LISP::?)"];
+25[label="(25 FOO-LISP::?)"];
+11--24[label=""];
+11--12[label=""];
+11--22[label=""];
+11--25[label=""];}

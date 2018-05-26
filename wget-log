@@ -1,0 +1,11 @@
+--2018-05-26 13:46:01--  https://vignette.wikia.nocookie.net/emporea/images/2/28/Blood_Drop.png/revision/latest?cb=20150714105338
+Resolving vignette.wikia.nocookie.net (vignette.wikia.nocookie.net)... 74.120.188.204, 74.120.188.194, 2620:11a:e002:fa00::204, ...
+Connecting to vignette.wikia.nocookie.net (vignette.wikia.nocookie.net)|74.120.188.204|:443... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 135212 (132K) [image/png]
+Saving to: ‘latest?cb=20150714105338’
+
+latest?cb=20150714105338                            0%[                                                                                                            ]       0  --.-KB/s               latest?cb=20150714105338                          100%[===========================================================================================================>] 132,04K  --.-KB/s    in 0,08s   
+
+2018-05-26 13:46:02 (1,52 MB/s) - ‘latest?cb=20150714105338’ saved [135212/135212]
+

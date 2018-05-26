@@ -190,7 +190,7 @@
 
 (defclass wumpus-world (buffer)
   ((wumpus-hunter-sprite :initform (make-instance 'wumpus-hunter-sprite))
-   (background-color :initform "gray")
+   (background-color :initform "black")
    (width :initform *width*)
    (height :initform *height*)))
 
@@ -232,7 +232,7 @@
   ;; Configure the screen dimensions
   (setf *window-title* "Grand Theft Wumpus")
   (setf *font* "sans-11")
-  (setf *frame-rate* 1)
+  (setf *frame-rate* 60)
   (setf *font-texture-scale* 1)
   (setf *font-texture-filter* :linear)
   (setf *screen-width* *width*)
@@ -257,7 +257,7 @@
 
 
 ;;;;;;;
-;;(walk 25)
+;;(walk 5)
 ;;(known-city-edges)
 
 

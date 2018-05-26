@@ -166,7 +166,6 @@
           (setf (node-number current-node) node-pos)
           (setf (objects current-node) objects)
           (grid-utils:set-node-mapping node-pos current-node)
-          (draw-mist-background)
           )))   
     (current-buffer)))
 
