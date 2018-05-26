@@ -31,7 +31,8 @@
 ;; each game loop.
 (defmethod update ((wumpus-hunter-sprite wumpus-hunter-sprite))
   (with-slots (heading speed) wumpus-hunter-sprite
-    (let ((node-pos (+ (random (length *congestion-city-nodes*)) 1)))
+    (let* ((node-pos (caar (known-city-edges))))
+      (draw-nodes (car (known-city-edges)))
       (grid-utils:move-node-to wumpus-hunter-sprite node-pos))))
 
 ;; Now we need walls around the game world in order to contain the
@@ -40,6 +41,10 @@
 (defclass city-node (node)
   ((color :initform "gray50")
    (image :initform "city-node.png")
+   (objects
+    :reader objects
+    :writer (setf objects)
+    :initform nil)
    (node-number
     :reader node-number
     :writer (setf node-number)
@@ -79,7 +84,8 @@
 
 (defclass cloud (node)
   ((color :initform "gray50")
-   (image :initform "cloud.png")))
+   (image :initform "cloud.png")
+   ))
 ;;
 (defun make-object (x y width height object-type)
   (let*((obj (make-instance object-type)))
@@ -129,15 +135,23 @@
         (insert (make-object xo yo  *objects-size*  *objects-size* (get-class-for obj)))
         (incf counter)))))
 
-(defun draw-mist-background (grid-x grid-y x y)
-  "Draws mist per row" 
-  (insert (make-object (- grid-x *city-node-size*) (- grid-y *city-node-size*) (* *city-node-size* 20) (* *city-node-size* (random 3)) 'cloud))
-  (insert (make-object x y (* *city-node-size* 20) (* *city-node-size* 2) 'cloud)))
-
-(defun draw-object(x y node objects)
+(defun draw-mist-background ()
+  "Draws mist per row"
+  (let ((x 0)
+        (y 0))
+      (dotimes (n 10)
+        (insert (make-object x y (* *city-node-size*  (random 15)) (* *city-node-size* (random 4)) 'cloud))
+        (setf y (* n *city-node-size*)))))
+  
+(defun draw-object(node)
   "Draws node and its objects"
-   (insert node)
-          (and objects (insert-objects x y objects)))
+  
+  (and node
+       (insert node))
+
+  (and node
+       (objects node)
+       (insert-objects (x node) (y node) (objects node))))
   
 (defun populate-city (city-nodes)
   (with-new-buffer
@@ -150,11 +164,25 @@
               (y grid-y)
               (current-node (make-object x y *city-node-size* *city-node-size* 'city-node)))
           (setf (node-number current-node) node-pos)
+          (setf (objects current-node) objects)
           (grid-utils:set-node-mapping node-pos current-node)
-          (draw-object x y current-node objects)
-          (draw-mist-background grid-x grid-y x y)
-          )))
+          (draw-mist-background)
+          )))   
     (current-buffer)))
+
+
+(defun draw-node (node-pos)
+  "doc"
+  (let ((current-node  (grid-utils:node-pos-to-node node-pos)))
+       (draw-object current-node)))
+
+(defun draw-nodes (node-list)
+  "doc"
+  (dolist (node node-list)
+    (let* ((node-pos (if (listp node) (car node) node)))
+      (draw-node node-pos))))
+
+
 
 
 

@@ -190,7 +190,7 @@
 
 (defclass wumpus-world (buffer)
   ((wumpus-hunter-sprite :initform (make-instance 'wumpus-hunter-sprite))
-   (background-color :initform "gray50")
+   (background-color :initform "gray")
    (width :initform *width*)
    (height :initform *height*)))
 
@@ -254,5 +254,18 @@
       ;; start the buffer running
       (switch-to-buffer wumpus-world)
       (start-game wumpus-world))))
+
+
+;;;;;;;
+;;(walk 25)
+;;(known-city-edges)
+
+
+
+
+
+
+
+
 
 
