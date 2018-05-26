@@ -27,13 +27,8 @@
    (count :initform 0)
    (last-collision :initform nil :accessor last-collision)))
 
-
-
-
 ;; The generic function [[file:dictionary/UPDATE.html][UPDATE]] is called on each object once during
 ;; each game loop.
-
-
 (defmethod update ((wumpus-hunter-sprite wumpus-hunter-sprite))
   (with-slots (heading speed) wumpus-hunter-sprite
     (let ((node-pos (+ (random (length *congestion-city-nodes*)) 1)))
@@ -82,6 +77,9 @@
   ((color :initform "gray50")
    (image :initform "mist.png")))
 
+(defclass cloud (node)
+  ((color :initform "black")
+   (image :initform "cloud.png")))
 ;;
 (defun make-object (x y width height object-type)
   (let*((obj (make-instance object-type)))
@@ -140,9 +138,10 @@
     (dotimes (count-y y-count)
       (dotimes (count-x x-count)
         (insert (make-object x y  *city-node-size* *city-node-size* 'mist))
-        (setf x (+ x *city-node-size*)))
-      (setf y (+ y *objects-size*))
-      (setf x 0))))
+        (setf x (* count-x *city-node-size*)))
+      (setf y (* count-y *objects-size*))
+      (setf x 0))
+    ))
 
 (defun populate-city (city-nodes)
   (with-new-buffer
@@ -157,6 +156,17 @@
           (setf (node-number current-node) node-pos)
           (grid-utils:set-node-mapping node-pos current-node)
           (insert current-node)
-          (and objects (insert-objects x y objects)))))
-    (draw-mist-background)
+          (and objects (insert-objects x y objects))
+          (insert (make-object (- grid-x (* *city-node-size* 2)) (- grid-y (* *city-node-size* 2)) (* *city-node-size*  4) (* *city-node-size* (random 3)) 'cloud))
+          (insert (make-object (- grid-x *city-node-size*) (- grid-y *city-node-size*) (* *city-node-size* 5) (* *city-node-size* (random 3)) 'cloud))
+          (insert (make-object x y (* *city-node-size* 15) (* *city-node-size* 2) 'cloud))
+          )))
     (current-buffer)))
+
+
+
+
+
+
+
+
