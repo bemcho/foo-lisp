@@ -251,11 +251,14 @@
 
 
 ;;;;;;;
-;;(walk 24)
+;;(walk 10)
 ;;(known-city-edges)
 ;;*keyboard-events*
 ;;*node-events*
 ;;(draw-connections (car (known-city-edges)))
+;;(member 'not-cops '(cops not-cops wumpus))
+;;*congestion-city-edges*
+;;*visited-nodes*
 
 
 

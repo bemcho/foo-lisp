@@ -175,6 +175,7 @@
          (insert node)
          (and (objects node)
               (insert-objects (x node) (y node) (objects node)))
+         (draw-string (write-to-string (node-number node)) (x node) (y  node) :font *score-font* :color "white")
          )))
 
 (defun populate-city (city-nodes)
@@ -190,13 +191,13 @@
           (setf (node-number current-node) node-pos)
           (setf (objects current-node) objects)
           (grid-utils:set-node-mapping node-pos current-node)
-          )))   
+          )))
     (current-buffer)))
 
 
 (defun draw-node (node-pos)
   "doc"
-  (let ((current-node  (grid-utils:node-pos-to-node node-pos)))
+  (let ((current-node (grid-utils:node-pos-to-node node-pos)))
        (draw-object current-node)))
 
 (defun draw-nodes (node-list)
