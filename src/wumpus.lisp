@@ -101,8 +101,8 @@
                        (cond ((eql n wumpus) '(wumpus))
                              ((within-two n wumpus edge-alist) '(blood!)))
                        (cond ((member n glow-worms) '(glow-worm))
-                             ((some (lambda (worm) (within-one n worm edge-alist)) glow-worms)
-                              '(lights!)))
+                             ((some (lambda (worm)
+                                      (within-one n worm edge-alist)) glow-worms) '(lights!)))
                        (when (some #'cdr (cdr (assoc n edge-alist))) '(sirens!))))))
 
 (defun new-game ()
@@ -188,11 +188,7 @@
 ;; But first, we need a Buffer subclass for the game board.
 
 
-(defclass wumpus-world (buffer)
-  ((wumpus-hunter-sprite :initform (make-instance 'wumpus-hunter-sprite))
-   (background-color :initform "black")
-   (width :initform *width*)
-   (height :initform *height*)))
+
 
 
 
@@ -255,11 +251,11 @@
 
 
 ;;;;;;;
-;;(walk 13)
+;;(walk 24)
 ;;(known-city-edges)
 ;;*keyboard-events*
 ;;*node-events*
-(draw-connections (car (known-city-edges)))
+;;(draw-connections (car (known-city-edges)))
 
 
 

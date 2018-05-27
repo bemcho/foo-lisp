@@ -220,10 +220,12 @@
               (src-y (plus-half-city-node (y source-node)))
               (targets-pos (rest nodes)))
     (dolist (node-pos targets-pos)
-      (let ((target-node (grid-utils:node-pos-to-node (car node-pos))))
-        (draw-line src-x src-y (plus-half-city-node (x target-node)) (plus-half-city-node (y target-node)) :color "orange"))))))
-  
-
+      (let ((target-node (grid-utils:node-pos-to-node (car node-pos)))
+            (cops (cdr node-pos)))
+        (draw-line src-x src-y (plus-half-city-node (x target-node)) (plus-half-city-node (y target-node)) :color "orange")
+        (and (member 'cops cops)
+             (insert (make-object (floor (x target-node) 2) (floor (y target-node) 2) *city-node-size* *city-node-size* 'cops)))
+        )))))
 
 
 
