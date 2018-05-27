@@ -15,8 +15,8 @@
 (in-package #:foo-lisp)
 
 (defclass wumpus-hunter-sprite (node)
-  ((height :initform (+ *objects-size* (units 1)))
-   (width :initform (+ *objects-size* (units 1)))
+  ((height :initform (+ *objects-size* (units 2)))
+   (width :initform (+ *objects-size* (units 2)))
    (max-dx :initform 100)
    (max-dy :initform 100)
    (max-ddy :initform 0.01)
@@ -31,10 +31,15 @@
 ;; each game loop.
 (defmethod update ((wumpus-hunter-sprite wumpus-hunter-sprite))
   (with-slots (heading speed) wumpus-hunter-sprite
-    (let* ((node-pos (caar (known-city-edges))))
-      (draw-nodes (car (known-city-edges)))
-      (grid-utils:move-node-to wumpus-hunter-sprite node-pos))))
+     (grid-utils:move-node-to wumpus-hunter-sprite (caar (known-city-edges)))
+   ))
 
+
+(defclass wumpus-world (buffer)
+  ((wumpus-hunter-sprite :initform (make-instance 'wumpus-hunter-sprite))
+   (background-color :initform "black")
+   (width :initform *width*)
+   (height :initform *height*)))
 ;; Now we need walls around the game world in order to contain the
 ;; ball.
 ;; cops
@@ -51,7 +56,12 @@
     :initform 0)))
 
 (defclass wumpus (node)
-  ((color :initform "white")
+  ((height :initform (+ *objects-size* (units 2)))
+   (width :initform (+ *objects-size* (units 2)))
+   (max-dx :initform 100)
+   (max-dy :initform 100)
+   (max-ddy :initform 0.01)
+   (color :initform "white")
    (image :initform "wumpus.png")))
 
 (defclass blood (node)
@@ -93,6 +103,11 @@
     (move-to obj x y)
     obj))
 
+
+
+(defmethod draw :after ((wumpus-world  wumpus-world))
+  (draw-nodes (known-city-edges)))
+
 ;; We want the ball to bounce off of the walls. The [[file:dictionary/COLLIDE.html][COLLIDE]] method is
 ;; called for every frame on all pairs of objects whose bounding boxes
 ;; collide during that frame.
@@ -108,8 +123,18 @@
 ;; Making noise
 
 ;; The ball should emit a retro beep when colliding with any node. We
-;; use [[file:dictionary/DEFRESOURCE.html][DEFRESOURCE]] to let Xelf know about the sound file. 
+;; use [[file:dictionary/DEFRESOURCE.html][DEFRESOURCE]] to let Xelf know about the sound file.
+(defparameter *keyboard-events* '()
+  "doc")
 
+(defmethod handle-event :around ((self buffer) event)
+  (pushnew event *keyboard-events*))
+
+(defparameter *node-events* '()
+  "doc")
+
+(defmethod handle-event :around ((self node) event)
+  (pushnew event *node-events*))
 
 (defmethod collide :after((wumpus-hunter-sprite wumpus-hunter-sprite) (node node)))
 
@@ -142,17 +167,16 @@
       (dotimes (n 10)
         (insert (make-object x y (* *city-node-size*  (random 15)) (* *city-node-size* (random 4)) 'cloud))
         (setf y (* n *city-node-size*)))))
-  
+
 (defun draw-object(node)
   "Draws node and its objects"
-  
   (and node
-       (insert node))
+       (progn
+         (insert node)
+         (and (objects node)
+              (insert-objects (x node) (y node) (objects node)))
+         )))
 
-  (and node
-       (objects node)
-       (insert-objects (x node) (y node) (objects node))))
-  
 (defun populate-city (city-nodes)
   (with-new-buffer
     (dolist (node city-nodes)
@@ -177,11 +201,28 @@
 
 (defun draw-nodes (node-list)
   "doc"
-  (dolist (node node-list)
+  (dolist (conn-list node-list)
+    (draw-connections conn-list)
+  (dolist (node conn-list)
     (let* ((node-pos (if (listp node) (car node) node)))
-      (draw-node node-pos))))
+      (draw-node node-pos)
+      ))))
 
+(defun plus-half-city-node (x-or-y)
+  (+ x-or-y (floor *city-node-size* 2)))
 
+(defun draw-connections (nodes)
+  "(car nodes) is the source,(rest nodes) is a list of list eg:  '(() ()) targets"
+  (and nodes
+       (car nodes)
+       (let* ((source-node (grid-utils:node-pos-to-node (car nodes)))
+              (src-x (plus-half-city-node (x source-node)))
+              (src-y (plus-half-city-node (y source-node)))
+              (targets-pos (rest nodes)))
+    (dolist (node-pos targets-pos)
+      (let ((target-node (grid-utils:node-pos-to-node (car node-pos))))
+        (draw-line src-x src-y (plus-half-city-node (x target-node)) (plus-half-city-node (y target-node)) :color "orange"))))))
+  
 
 
 

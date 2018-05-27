@@ -9,6 +9,8 @@
 (defparameter *padding-inside-node* (units 3))
 (defparameter *objects-size* (units 3) "in pixels")
 
+(defparameter *score-font* "sans-mono-bold-12")
+(defparameter *big-font* "sans-mono-bold-16")
 
 
 

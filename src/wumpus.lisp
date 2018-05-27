@@ -217,9 +217,7 @@
                          *city-node-size* *space-btw-nodes* *padding-inside-node*
                          *objects-size* (ceiling  (sqrt (length *congestion-city-nodes*))) *visited-nodes*)
       (paste-from wumpus-world (populate-city *congestion-city-nodes*))
-      (insert  wumpus-hunter-sprite)
-      (let ((current-node (grid-utils:get-wumpus-hunter-node)))
-        (grid-utils:move-node-to wumpus-hunter-sprite (node-number current-node))))))
+      (insert  wumpus-hunter-sprite))))
 
 
 
@@ -232,7 +230,7 @@
   ;; Configure the screen dimensions
   (setf *window-title* "Grand Theft Wumpus")
   (setf *font* "sans-11")
-  (setf *frame-rate* 2)
+  (setf *frame-rate* 30)
   (setf *font-texture-scale* 1)
   (setf *font-texture-filter* :linear)
   (setf *screen-width* *width*)
@@ -257,8 +255,11 @@
 
 
 ;;;;;;;
-;;(walk 15)
+;;(walk 13)
 ;;(known-city-edges)
+;;*keyboard-events*
+;;*node-events*
+(draw-connections (car (known-city-edges)))
 
 
 

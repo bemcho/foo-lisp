@@ -4,7 +4,6 @@
    #:config
    #:node-pos-to-node
    #:set-node-mapping
-   #:get-wumpus-hunter-node
    #:move-node-to
    #:get-nth-grid-box-coord
    #:get-next-x
@@ -18,7 +17,7 @@
 (defparameter *space-btw-nodes* 40 "in pixels")
 (defparameter *padding-inside-node* 15 "in pixels")
 (defparameter *objects-size* 20 "in pixels")
-(defparameter *visited-nodes* '()  "reference to list of agent's visited nodes as fist is current node")
+(defparameter *visited-nodes* '()  "reference to function of agent's visited nodes as fist is current node")
 
 
 (defparameter *node-offset* (+ *city-node-size* *space-btw-nodes*) "in pixels")
@@ -56,10 +55,6 @@
 (defun set-node-mapping (pos node)
   "doc"
   (setf (gethash pos *node-to-coordinates-map*) node))
-
-(defun get-wumpus-hunter-node ()
-  "doc"
-  (node-pos-to-node (car *visited-nodes*)))
 
 (defun move-node-to (node node-pos)
   "doc"

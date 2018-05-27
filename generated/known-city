@@ -1,18 +1,11 @@
 graph{
-25[label="(25 ?)"];
-11[label="(11)"];
-1[label="(1 ?)"];
-29[label="(29 ?)"];
-21[label="(21 LIGHTS! SIRENS! *)"];
 27[label="(27 ?)"];
-18[label="(18 ?)"];
-24[label="(24 ?)"];
-21--25[label=""];
-21--29[label=""];
-21--24[label=""];
-21--1[label=""];
-11--29[label=""];
-11--21[label=""];
-11--27[label=""];
-11--18[label=""];
-11--24[label=""];}
+30[label="(30)"];
+21[label="(21 ?)"];
+2[label="(2 SIRENS! *)"];
+10[label="(10 SIRENS!)"];
+2--27[label=""];
+10--2[label="(COPS)"];
+10--21[label=""];
+30--2[label=""];
+30--10[label=""];}
