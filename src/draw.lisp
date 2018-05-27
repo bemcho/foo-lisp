@@ -221,11 +221,15 @@
               (src-y (plus-half-city-node (y source-node)))
               (targets-pos (rest nodes)))
     (dolist (node-pos targets-pos)
-      (let ((target-node (grid-utils:node-pos-to-node (car node-pos)))
+      (let* ((target-node (grid-utils:node-pos-to-node (car node-pos)))
+             (x-target (x target-node))
+             (y-target (y target-node))
+             (skip-cops (or (> src-x x-target) (> src-y y-target)))
             (cops (cdr node-pos)))
-        (draw-line src-x src-y (plus-half-city-node (x target-node)) (plus-half-city-node (y target-node)) :color "orange")
-        (and (member 'cops cops)
-             (insert (make-object (floor (x target-node) 2) (floor (y target-node) 2) *city-node-size* *city-node-size* 'cops)))
+        (draw-line src-x src-y (plus-half-city-node x-target) (plus-half-city-node y-target) :color "orange")
+        (or skip-cops
+            (and (member 'cops cops)
+             (insert (make-object (floor x-target 2) (floor y-target 2) *city-node-size* *city-node-size* 'cops))))
         )))))
 
 

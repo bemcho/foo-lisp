@@ -251,7 +251,7 @@
 
 
 ;;;;;;;
-;;(walk 10)
+;;(walk 8)
 ;;(known-city-edges)
 ;;*keyboard-events*
 ;;*node-events*
