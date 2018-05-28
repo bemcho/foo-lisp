@@ -120,7 +120,7 @@
         x)))
 
 (defun draw-city ()
-  (ugraph->png "../generated/city" *congestion-city-nodes* *congestion-city-edges*))
+  (ugraph->png "generated/city" *congestion-city-nodes* *congestion-city-edges*))
 
 
 (defun known-city-nodes ()
@@ -147,7 +147,7 @@
           *visited-nodes*))
 
 (defun draw-known-city ()
-  (ugraph->png "../generated/known-city" (known-city-nodes) (known-city-edges)))
+  (ugraph->png "generated/known-city" (known-city-nodes) (known-city-edges)))
 
 
 (defun walk (pos)
@@ -251,7 +251,8 @@
 
 
 ;;;;;;;
-;;(walk 8)
+;;(walk 9)
+;;(charge 26)
 ;;(known-city-edges)
 ;;*keyboard-events*
 ;;*node-events*
@@ -259,7 +260,8 @@
 ;;(member 'not-cops '(cops not-cops wumpus))
 ;;*congestion-city-edges*
 ;;*visited-nodes*
-
+;;(start-game wumpus-world)
+;;(wumpus-game)
 
 
 
