@@ -96,6 +96,12 @@
   ((color :initform "gray50")
    (image :initform "cloud.png")
    ))
+
+(defclass question-mark (node)
+  ((color :initform "gray50")
+   (image :initform "question-mark.png")
+   ))
+
 ;;
 (defun make-object (x y width height object-type)
   (let*((obj (make-instance object-type)))
@@ -149,6 +155,7 @@
         ((eql wumpus-city-symbol 'WUMPUS) 'wumpus)
         ((eql wumpus-city-symbol 'GLOW-WORM) 'glowworm)
         ((eql wumpus-city-symbol 'COPS) 'cops)
+         ((eql wumpus-city-symbol '?) 'question-mark)
         ))
 
 (defun insert-objects (x y objects)
@@ -160,7 +167,7 @@
         (insert (make-object xo yo  *objects-size*  *objects-size* (get-class-for obj)))
         (incf counter)))))
 
-(defun draw-mist-background ()
+(defun draw-cloud-background ()
   "Draws mist per row"
   (let ((x 0)
         (y 0))
@@ -168,15 +175,21 @@
         (insert (make-object x y (* *city-node-size*  (random 15)) (* *city-node-size* (random 4)) 'cloud))
         (setf y (* n *city-node-size*)))))
 
+
+
 (defun draw-object(node)
   "Draws node and its objects"
-  (and node
-       (progn
-         (insert node)
-         (and (objects node)
-              (insert-objects (x node) (y node) (objects node)))
-         (draw-string (write-to-string (node-number node)) (x node) (y  node) :font *score-font* :color "white")
-         )))
+  (let* ((node-pos (node-number node))
+         (x (x node))
+         (y (y node))
+         (objs (objects node)))
+    (and node
+         (progn
+           (if (member node-pos *visited-nodes*)
+               (progn (insert node) (and objs  (insert-objects x y objs)))
+               (insert (make-object x y (width node) (height node) 'question-mark)))
+           (draw-string (write-to-string node-pos) x y :font *score-font* :color "white")
+           ))))
 
 (defun populate-city (city-nodes)
   (with-new-buffer
@@ -204,9 +217,9 @@
   "doc"
   (dolist (conn-list node-list)
     (draw-connections conn-list)
-  (dolist (node conn-list)
-    (let* ((node-pos (if (listp node) (car node) node)))
-      (draw-node node-pos)
+    (dolist (node conn-list)
+      (let* ((node-pos (if (listp node) (car node) node)))
+        (draw-node node-pos)
       ))))
 
 (defun plus-half-city-node (x-or-y)
@@ -224,14 +237,17 @@
            (let* ((target-node (grid-utils:node-pos-to-node (car node-pos)))
                   (x-target (x target-node))
                   (y-target (y target-node))
+                  (half-node (plus-half-city-node 0))
+                  (cops-size (* *objects-size* 2))
                   ;(x-half-path (plus-half-city-node (floor (max src-x (plus-half-city-node x-target)) 2)))
                   ;(y-half-path (plus-half-city-node (floor (max src-y (plus-half-city-node y-target)) 2)))
                   (cops (cdr node-pos)))
              (draw-line src-x src-y (plus-half-city-node x-target) (plus-half-city-node y-target) :color "orange")
              (and (member 'cops cops)
-                  (insert (make-object src-x src-y (plus-half-city-node 0) (plus-half-city-node 0) 'cops))
-                  (insert (make-object target-x target-y (plus-half-city-node 0) (plus-half-city-node 0) 'cops))))
+                  (insert (make-object (- src-x half-node) src-y cops-size cops-size 'cops))
+                  (insert (make-object (- target-x half-node) target-y cops-size cops-size 'cops))))
              ))))
+
 
 
 
