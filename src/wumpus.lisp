@@ -251,7 +251,8 @@
 
 
 ;;;;;;;
-;;(walk 8)
+;;(walk 9)
+;;(charge 26)
 ;;(known-city-edges)
 ;;*keyboard-events*
 ;;*node-events*
@@ -259,7 +260,8 @@
 ;;(member 'not-cops '(cops not-cops wumpus))
 ;;*congestion-city-edges*
 ;;*visited-nodes*
-
+;;(start-game wumpus-world)
+;;(wumpus-game)
 
 
 
