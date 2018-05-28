@@ -1,4 +1,6 @@
 graph{
 22[label="(22 *)"];
-5[label="(5 FOO-LISP::?)"];
-22--5[label=""];}
+10[label="(10 FOO-LISP::?)"];
+13[label="(13 FOO-LISP::?)"];
+22--10[label=""];
+22--13[label=""];}
