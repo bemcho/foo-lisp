@@ -120,7 +120,7 @@
         x)))
 
 (defun draw-city ()
-  (ugraph->png "../generated/city" *congestion-city-nodes* *congestion-city-edges*))
+  (ugraph->png "generated/city" *congestion-city-nodes* *congestion-city-edges*))
 
 
 (defun known-city-nodes ()
@@ -147,7 +147,7 @@
           *visited-nodes*))
 
 (defun draw-known-city ()
-  (ugraph->png "../generated/known-city" (known-city-nodes) (known-city-edges)))
+  (ugraph->png "generated/known-city" (known-city-nodes) (known-city-edges)))
 
 
 (defun walk (pos)
