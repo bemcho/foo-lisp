@@ -109,9 +109,13 @@
     (move-to obj x y)
     obj))
 
-
+(defun show-instructions (x y)
+  "Draws instructions starting from x y"
+  (with-buffer (current-buffer)
+    (draw-string "2 blood nodes away is the wumpus.2 lights nodes away is some Glow Worms Gang.You see siren on the next one you are busted by cops. Kill the wumpus with right click or charge." x y :font *big-font* :color "orange")))
 
 (defmethod draw :after ((wumpus-world  wumpus-world))
+  (show-instructions 20 20)
   (draw-nodes (known-city-edges)))
 
 ;; We want the ball to bounce off of the walls. The [[file:dictionary/COLLIDE.html][COLLIDE]] method is

@@ -216,7 +216,10 @@
       (insert  wumpus-hunter-sprite))))
 
 
-
+(defun show-instructions (x y)
+  "Draws instructions starting from x y"
+  (with-buffer (current-buffer)
+   (draw-string "You see blood, two nodes away is the wumpus. You see lights 2 nodes away is some Glow Worms Gang.You see siren on the next one you are busted by cops. Kill the wumpus with right click or charge." x y :font *big-font* :color "white")))
 ;; Now we define the main entry point for the game, the function
 ;; PLONG. We set up our variables and then invoke [[file:dictionary/WITH-SESSION.html][WITH-SESSION]] to start
 ;; Xelf going.
@@ -251,8 +254,8 @@
 
 
 ;;;;;;;
-;;(walk 25)
-;;(charge 6)
+;;(walk 18)
+;;(charge 29)
 ;;(known-city-edges)
 ;;*keyboard-events*
 ;;*node-events*
