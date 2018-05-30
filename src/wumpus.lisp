@@ -215,7 +215,7 @@
 (defun show-instructions (x y)
   "Draws instructions starting from x y"
   (with-buffer (current-buffer)
-   (draw-string "2 nodes with Blood away is the wumpus. 2 nodes with lights away is some Glow Worms Gang.You see siren on the next one you are busted by cops. Kill the wumpus with right click.Ctrl-R to reset." x y :font *big-font* :color "orange")))
+   (draw-string "2 nodes with Blood away is the wumpus.2 nodes with Lights away is some Glow Worms Gang.1 siren on the next one you are busted by cops.Kill the wumpus with RMB.(ctrl r) to reset" x y :font *big-font* :color "orange")))
 ;; Now we define the main entry point for the game, the function
 ;; We set up our variables and then invoke [[file:dictionary/WITH-SESSION.html][WITH-SESSION]] to start
 ;; Xelf going.

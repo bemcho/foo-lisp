@@ -208,6 +208,7 @@
               (current-node (make-object x y *city-node-size* *city-node-size* 'city-node)))
           (setf (node-number current-node) node-pos)
           (setf (objects current-node) objects)
+          (xelf:bind-any-default-events current-node)
           (grid-utils:set-node-mapping node-pos current-node)
           )))
     (current-buffer)))
