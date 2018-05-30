@@ -42,12 +42,6 @@
    (setf *grid-height* (floor *height* *grid-max-row-cols*))
    (setf *node-to-coordinates-map* (make-hash-table :test 'equal)))
 
-(defun move-node-to (node node-pos)
-  "doc"
-  (let ((wumpus-node (node-pos-to-node node-pos)))
-    (xelf:move-to node
-                  (+ (xelf:x wumpus-node) *half-city-node* *padding-inside-node*)
-                  (+ (xelf:y wumpus-node) *half-city-node* *padding-inside-node*))))
 ;; 2D grid utils
 
 

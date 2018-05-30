@@ -277,9 +277,11 @@
 
 (defun move-node-to (node node-pos)
   "doc"
-  (xelf:move-to node
-                (+ (xelf:x node) *half-city-node* *padding-inside-node*)
-                (+ (xelf:y node) *half-city-node* *padding-inside-node*)))
+  (let ((hunter-node (node-pos-to-node node-pos)))
+    (and hunter-node node
+      (xelf:move-to node
+                (+ (xelf:x hunter-node) *half-city-node* *padding-inside-node*)
+                (+ (xelf:y hunter-node) *half-city-node* *padding-inside-node*)))))
 
 
 

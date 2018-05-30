@@ -241,7 +241,7 @@
 
 
 ;;;;;;;
-;;(walk 11)
+;;(walk 24)
 ;;(charge 15)
 ;;(known-city-edges)
 ;;*keyboard-events*
