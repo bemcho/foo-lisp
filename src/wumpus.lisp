@@ -179,23 +179,16 @@
                       (princ new-pos)
                       (handle-new-place nil new-pos nil))))))
 
-;; See also [[file:dictionary/ADD-NODE.html][ADD-NODE]].
-
-;; You can see that MAKE-PUZZLE also returns a new buffer. We'll put
-;; together these component buffers into the final game board below
-;; with a function called [[file:dictionary/PASTE.html][PASTE]].
-
-;; But first, we need a Buffer subclass for the game board.
 
 
+(defmethod tap ((self city-node) x y) (walk (node-number city-node)))
 
+(defmethod press ((self node) x y &optional button)
+  (declare (ignore x y button))
+  (walk (node-number city-node)))
 
-
-
-;; After initializing a new Plong buffer, we set things up so that
+;; After initializing a new Wumpus buffer, we set things up so that
 ;; pressing Control-R causes the game to reset.
-
-
 (defmethod initialize-instance :after (( wumpus-world  wumpus-world) &key)
   (bind-event  wumpus-world '(:r :control) 'start-game))
 
@@ -208,20 +201,23 @@
 (defmethod start-game ((wumpus-world  wumpus-world))
   (with-slots (wumpus-hunter-sprite) wumpus-world
     (with-buffer wumpus-world
+      (xelf:do-nodes  (node wumpus-world)
+        (xelf:remove-node wumpus-world node ))
+      (insert  wumpus-hunter-sprite)
       (new-game)
       (grid-utils:config *width* *height*
                          *city-node-size* *space-btw-nodes* *padding-inside-node*
                          *objects-size* (ceiling  (sqrt (length *congestion-city-nodes*))) *visited-nodes*)
       (paste-from wumpus-world (populate-city *congestion-city-nodes*))
-      (insert  wumpus-hunter-sprite))))
+      (grid-utils:move-node-to wumpus-hunter-sprite (car *visited-nodes*)))))
 
 
 (defun show-instructions (x y)
   "Draws instructions starting from x y"
   (with-buffer (current-buffer)
-   (draw-string "You see blood, two nodes away is the wumpus. You see lights 2 nodes away is some Glow Worms Gang.You see siren on the next one you are busted by cops. Kill the wumpus with right click or charge." x y :font *big-font* :color "white")))
+   (draw-string "2 nodes with Blood away is the wumpus. 2 nodes with lights away is some Glow Worms Gang.You see siren on the next one you are busted by cops. Kill the wumpus with right click.Ctrl-R to reset." x y :font *big-font* :color "orange")))
 ;; Now we define the main entry point for the game, the function
-;; PLONG. We set up our variables and then invoke [[file:dictionary/WITH-SESSION.html][WITH-SESSION]] to start
+;; We set up our variables and then invoke [[file:dictionary/WITH-SESSION.html][WITH-SESSION]] to start
 ;; Xelf going.
 
 
@@ -254,7 +250,7 @@
 
 
 ;;;;;;;
-;;(walk 18)
+;;(walk 1)
 ;;(charge 29)
 ;;(known-city-edges)
 ;;*keyboard-events*
@@ -264,13 +260,16 @@
 ;;*congestion-city-edges*
 ;;*congestion-city-nodes*
 ;;(member 132 *visited-nodes*)
-;;(start-game wumpus-world)
+;; (with-session
+;;   (with-buffer 
+;;       (xelf:clean-buffer (current-buffer))
+;;(current-buffer)))
 ;;(wumpus-game)
-;;(new-game)
+;;(start-game (current-buffer))
 ;;(stop wumpus-world)
 ;;(do-reset)
 ;;(at-next-update (destroy self))
-
+;;(open-shell (current-buffer))
 
 
 

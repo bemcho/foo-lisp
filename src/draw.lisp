@@ -31,8 +31,9 @@
 ;; each game loop.
 (defmethod update ((wumpus-hunter-sprite wumpus-hunter-sprite))
   (with-slots (heading speed) wumpus-hunter-sprite
-     (grid-utils:move-node-to wumpus-hunter-sprite (caar (known-city-edges)))
-   ))
+    (let ((current-node-pos (caar (known-city-edges))))
+      (and current-node-pos
+           (grid-utils:move-node-to wumpus-hunter-sprite current-node-pos )))))
 
 
 (defclass wumpus-world (buffer)
@@ -115,7 +116,7 @@
     (draw-string "2 blood nodes away is the wumpus.2 lights nodes away is some Glow Worms Gang.You see siren on the next one you are busted by cops. Kill the wumpus with right click or charge." x y :font *big-font* :color "orange")))
 
 (defmethod draw :after ((wumpus-world  wumpus-world))
-  (show-instructions 20 20)
+  (show-instructions 0 20)
   (draw-nodes (known-city-edges)))
 
 ;; We want the ball to bounce off of the walls. The [[file:dictionary/COLLIDE.html][COLLIDE]] method is
@@ -198,7 +199,7 @@
 (defun populate-city (city-nodes)
   (with-new-buffer
     (dolist (node city-nodes)
-      (multiple-value-bind (grid-x grid-y)
+      (multiple-value-bind(grid-x grid-y)
           (grid-utils:get-nth-grid-box-coord (car node))
         (let*((node-pos (car node))
               (objects (rest node))

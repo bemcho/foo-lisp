@@ -17,8 +17,6 @@
 (defparameter *space-btw-nodes* 40 "in pixels")
 (defparameter *padding-inside-node* 15 "in pixels")
 (defparameter *objects-size* 20 "in pixels")
-(defparameter *visited-nodes* '()  "reference to function of agent's visited nodes as fist is current node")
-
 
 (defparameter *node-offset* (+ *city-node-size* *space-btw-nodes*) "in pixels")
 (defparameter *x-max-objects* (floor *width* *space-btw-nodes*) "optimal nodes count per row")
@@ -38,7 +36,6 @@
         *space-btw-nodes* space-btw-nodes
         *padding-inside-node*  padding-inside-node
         *objects-size* object-size
-        *visited-nodes*  ref-to-visited-nodes
         *grid-max-row-cols* grid-max-row-cols)
 
    (setf *grid-width*  (floor *width* *grid-max-row-cols*))
