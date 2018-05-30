@@ -280,8 +280,8 @@
   (let ((hunter-node (node-pos-to-node node-pos)))
     (and hunter-node node
       (xelf:move-to node
-                (+ (xelf:x hunter-node) *half-city-node* *padding-inside-node*)
-                (+ (xelf:y hunter-node) *half-city-node* *padding-inside-node*)))))
+                (+ (xelf:x hunter-node) *half-city-node*)
+                (+ (xelf:y hunter-node) *half-city-node*)))))
 
 
 
