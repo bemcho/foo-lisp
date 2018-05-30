@@ -13,7 +13,7 @@
 (defparameter *big-font* "sans-mono-bold-16")
 (defparameter *message-box-x* 30)
 (defparameter *message-box-y* (- *height* 50))
-
+(defparameter *half-city-node* (floor *city-node-size* 2)  "in pixels")
 
 
 

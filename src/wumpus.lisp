@@ -203,8 +203,7 @@
       (grid-utils:config *width* *height*
                          *city-node-size* *space-btw-nodes* *padding-inside-node*
                          *objects-size* (ceiling  (sqrt (length *congestion-city-nodes*))) *visited-nodes*)
-      (paste-from wumpus-world (populate-city *congestion-city-nodes*))
-      (grid-utils:move-node-to wumpus-hunter-sprite (car *visited-nodes*)))))
+      )))
 
 
 ;; Now we define the main entry point for the game, the function
@@ -242,12 +241,13 @@
 
 
 ;;;;;;;
-;;(walk 28)
-;;(charge 29)
+;;(walk 11)
+;;(charge 15)
 ;;(known-city-edges)
 ;;*keyboard-events*
 ;;*node-events*
 ;;(draw-connections (car (known-city-edges)))
+;;(node-pos-to-node 22)
 ;;(member 'not-cops '(cops not-cops wumpus))
 ;;*congestion-city-edges*
 ;;*congestion-city-nodes*
@@ -259,10 +259,14 @@
 ;;(wumpus-game)
 ;;(start-game (current-buffer))
 ;;(stop wumpus-world)
-;;(do-reset)
+;;*player-pos*
 ;;(at-next-update (destroy self))
 ;;(open-shell (current-buffer))
 ;;(show-game-message 100 100 "Hello")
+;;(wumpus-game)
+
+
+
 
 
 

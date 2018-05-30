@@ -42,18 +42,6 @@
    (setf *grid-height* (floor *height* *grid-max-row-cols*))
    (setf *node-to-coordinates-map* (make-hash-table :test 'equal)))
 
-(defparameter *node-to-coordinates-map* (make-hash-table :test 'equal))
-
-(defun  node-pos-to-node(pos)
-  "doc"
-  (multiple-value-bind (node found)
-      (gethash pos *node-to-coordinates-map*)
-    node))
-
-(defun set-node-mapping (pos node)
-  "doc"
-  (setf (gethash pos *node-to-coordinates-map*) node))
-
 (defun move-node-to (node node-pos)
   "doc"
   (let ((wumpus-node (node-pos-to-node node-pos)))

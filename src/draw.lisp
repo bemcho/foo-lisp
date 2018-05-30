@@ -31,9 +31,8 @@
 ;; each game loop.
 (defmethod update ((wumpus-hunter-sprite wumpus-hunter-sprite))
   (with-slots (heading speed) wumpus-hunter-sprite
-    (let ((current-node-pos (caar (known-city-edges))))
-      (and current-node-pos
-           (grid-utils:move-node-to wumpus-hunter-sprite current-node-pos)))))
+    (and *player-pos*
+         (move-node-to wumpus-hunter-sprite *player-pos*))))
 
 
 (defclass wumpus-world (buffer)
@@ -98,7 +97,7 @@
    (image :initform "cloud.png")
    ))
 
-(defclass question-mark (node)
+(defclass question-mark (city-node)
   ((color :initform "gray50")
    (image :initform "question-mark.png")
    ))
@@ -184,9 +183,12 @@
 
 
 
-(defun draw-object(node)
+(defun draw-object(maybe-node pos)
   "Draws node and its objects"
-  (let* ((node-pos (node-number node))
+  (multiple-value-bind (x y)
+      (grid-utils:get-nth-grid-box-coord pos)
+  (let* ((node (if maybe-node maybe-node (make-object x y *city-node-size* *city-node-size* 'city-node)))
+         (node-pos (setf (node-number node) pos))
          (x (x node))
          (y (y node))
          (objs (objects node)))
@@ -194,9 +196,11 @@
          (progn
            (if (member node-pos *visited-nodes*)
                (progn (insert node) (and objs  (insert-objects x y objs)))
-               (insert (make-object x y (width node) (height node) 'question-mark)))
+               (let* ((n (make-object x y (width node) (height node) 'question-mark)))
+                 (setf (node-number n) pos)
+                 (insert n)))
            (draw-string (write-to-string node-pos) x y :font *big-font* :color "white")
-           ))))
+           )))))
 
 (defun populate-city (city-nodes)
   (with-new-buffer
@@ -211,24 +215,23 @@
           (setf (node-number current-node) node-pos)
           (setf (objects current-node) objects)
           (xelf:bind-any-default-events current-node)
-          (grid-utils:set-node-mapping node-pos current-node)
           )))
     (current-buffer)))
 
 
 (defun draw-node (node-pos)
   "doc"
-  (let ((current-node (grid-utils:node-pos-to-node node-pos)))
-       (draw-object current-node)))
+  (let ((current-node (node-pos-to-node node-pos)))
+       (draw-object current-node node-pos)))
 
 (defun draw-nodes (node-list)
   "doc"
   (dolist (conn-list node-list)
-    (draw-connections conn-list)
     (dolist (node conn-list)
       (let* ((node-pos (if (listp node) (car node) node)))
         (draw-node node-pos)
-      ))))
+        ))
+       (draw-connections conn-list)))
 
 (defun plus-half-city-node (x-or-y)
   (+ x-or-y (floor *city-node-size* 2)))
@@ -236,13 +239,12 @@
 (defun draw-connections (nodes)
   "(car nodes) is the source,(rest nodes) is a list of list eg:  '(() ()) targets"
   (and nodes
-       (car nodes)
-       (let* ((source-node (grid-utils:node-pos-to-node (car nodes)))
+       (let* ((source-node (node-pos-to-node (car nodes)))
               (src-x (plus-half-city-node (x source-node)))
               (src-y (plus-half-city-node (y source-node)))
               (targets-pos (rest nodes)))
          (dolist (node-pos targets-pos)
-           (let* ((target-node (grid-utils:node-pos-to-node (car node-pos)))
+           (let* ((target-node (node-pos-to-node (car node-pos)))
                   (x-target (x target-node))
                   (y-target (y target-node))
                   (half-node (plus-half-city-node 0))
@@ -266,7 +268,18 @@
   (with-buffer (current-buffer)
     (draw-string "2 nodes with Blood away is the wumpus.2 nodes with Lights away is some Glow Worms Gang.1 siren on the next one you are busted by cops.Kill the wumpus with RMB.(ctrl r) to reset" x y :font *big-font* :color "orange")))
 
+(defun  node-pos-to-node(pos)
+  "doc"
+  (car (member pos
+               (xelf:find-instances (xelf:current-buffer) 'city-node )
+               :key #'(lambda (n) (node-number (if (listp n)(car n) n))))))
 
+
+(defun move-node-to (node node-pos)
+  "doc"
+  (xelf:move-to node
+                (+ (xelf:x node) *half-city-node* *padding-inside-node*)
+                (+ (xelf:y node) *half-city-node* *padding-inside-node*)))
 
 
 
