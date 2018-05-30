@@ -245,6 +245,7 @@
     (preload-resources)
     (let ((wumpus-world (make-instance 'wumpus-world)))
       ;; start the buffer running
+      (xelf:bind-any-default-events wumpus-world)
       (switch-to-buffer wumpus-world)
       (start-game wumpus-world))))
 
