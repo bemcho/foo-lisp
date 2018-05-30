@@ -11,8 +11,8 @@
 
 (defparameter *score-font* "sans-mono-bold-12")
 (defparameter *big-font* "sans-mono-bold-16")
-
-
+(defparameter *message-box-x* 30)
+(defparameter *message-box-y* (- *height* 50))
 
 
 

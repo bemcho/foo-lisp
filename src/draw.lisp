@@ -33,7 +33,7 @@
   (with-slots (heading speed) wumpus-hunter-sprite
     (let ((current-node-pos (caar (known-city-edges))))
       (and current-node-pos
-           (grid-utils:move-node-to wumpus-hunter-sprite current-node-pos )))))
+           (grid-utils:move-node-to wumpus-hunter-sprite current-node-pos)))))
 
 
 (defclass wumpus-world (buffer)
@@ -117,7 +117,9 @@
 
 (defmethod draw :after ((wumpus-world  wumpus-world))
   (show-instructions 20 20)
-  (draw-nodes (known-city-edges)))
+  (draw-nodes (known-city-edges))
+  (and *game-message* (not (= (length  *game-message*) 0))
+  (show-game-message *message-box-x* *message-box-y* *game-message*)))
 
 ;; We want the ball to bounce off of the walls. The [[file:dictionary/COLLIDE.html][COLLIDE]] method is
 ;; called for every frame on all pairs of objects whose bounding boxes
@@ -193,7 +195,7 @@
            (if (member node-pos *visited-nodes*)
                (progn (insert node) (and objs  (insert-objects x y objs)))
                (insert (make-object x y (width node) (height node) 'question-mark)))
-           (draw-string (write-to-string node-pos) x y :font *score-font* :color "white")
+           (draw-string (write-to-string node-pos) x y :font *big-font* :color "white")
            ))))
 
 (defun populate-city (city-nodes)
@@ -255,7 +257,14 @@
              ))))
 
 
+(defun show-game-message (x y msg)
+  "Shows msg starting with x y"
+  (draw-string msg x y :font *big-font* :color "red"))
 
+(defun show-instructions (x y)
+  "Draws instructions starting from x y"
+  (with-buffer (current-buffer)
+    (draw-string "2 nodes with Blood away is the wumpus.2 nodes with Lights away is some Glow Worms Gang.1 siren on the next one you are busted by cops.Kill the wumpus with RMB.(ctrl r) to reset" x y :font *big-font* :color "orange")))
 
 
 

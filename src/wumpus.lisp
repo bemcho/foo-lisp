@@ -4,6 +4,7 @@
 (defparameter *congestion-city-nodes* nil)
 (defparameter *congestion-city-edges* nil)
 (defparameter *visited-nodes* nil)
+(defparameter *game-message* "")
 (defparameter *node-num* 30)
 (defparameter *edge-num* 45)
 (defparameter *worm-num* 3)
@@ -110,9 +111,8 @@
   (setf *congestion-city-nodes* (make-city-nodes *congestion-city-edges*))
   (setf *player-pos* (find-empty-node))
   (setf *visited-nodes* (list *player-pos*))
-  (draw-city)
-  (draw-known-city))
-
+  (setf *game-message* (format nil "You are on node [~d]" *player-pos*)))
+  
 (defun find-empty-node ()
   (let ((x (random-node)))
     (if (cdr (assoc x *congestion-city-nodes*))
@@ -160,7 +160,7 @@
   (let ((edge (assoc pos (cdr (assoc *player-pos* *congestion-city-edges*)))))
     (if edge
         (handle-new-place edge pos charging)
-        (princ "That location does not exist!"))))
+        (setf *game-message* (format nil "You can't go there ->  position: [~d]" pos)))))
 
 (defun handle-new-place (edge pos charging)
   (let* ((node (assoc pos *congestion-city-nodes*))
@@ -168,24 +168,19 @@
                         (not (member pos *visited-nodes*)))))
     (pushnew pos *visited-nodes*)
     (setf *player-pos* pos)
-    (draw-known-city)
-    (cond ((member 'cops edge) (princ "You ran into the cops. Game Over."))
+    (setf *game-message*  (format nil  "You are on node [ ~d ]  with ~a" pos (rest node)))
+    ;;(draw-known-city)
+    (cond ((member 'cops edge) (setf *game-message* "You ran into the cops. Game Over."))
           ((member 'wumpus node) (if charging
-                                     (princ "You found the Wumpus! You WON!")
-                                     (princ "You ran into the Wumpus. He killed you.")))
-          (charging (princ "You wasted your last bullet. Game Over."))
+                                     (setf *game-message*  "You found the Wumpus! You WON!")
+                                     (setf *game-message*  "You ran into the Wumpus. He killed you.")))
+          (charging  (setf *game-message* "You wasted your last bullet. Game Over."))
           (has-worm (let ((new-pos (random-node)))
-                      (princ "You ran into a Glow Worm Gang! You're now at ")
+                      (setf *game-message* "You ran into a Glow Worm Gang! You're now at ")
                       (princ new-pos)
                       (handle-new-place nil new-pos nil))))))
 
 
-
-(defmethod tap ((self city-node) x y) (walk (node-number city-node)))
-
-(defmethod press ((self node) x y &optional button)
-  (declare (ignore x y button))
-  (walk (node-number city-node)))
 
 ;; After initializing a new Wumpus buffer, we set things up so that
 ;; pressing Control-R causes the game to reset.
@@ -202,7 +197,7 @@
   (with-slots (wumpus-hunter-sprite) wumpus-world
     (with-buffer wumpus-world
       (xelf:do-nodes  (node wumpus-world)
-        (xelf:remove-node wumpus-world node ))
+        (xelf:remove-node wumpus-world node))
       (insert  wumpus-hunter-sprite)
       (new-game)
       (grid-utils:config *width* *height*
@@ -212,10 +207,6 @@
       (grid-utils:move-node-to wumpus-hunter-sprite (car *visited-nodes*)))))
 
 
-(defun show-instructions (x y)
-  "Draws instructions starting from x y"
-  (with-buffer (current-buffer)
-   (draw-string "2 nodes with Blood away is the wumpus.2 nodes with Lights away is some Glow Worms Gang.1 siren on the next one you are busted by cops.Kill the wumpus with RMB.(ctrl r) to reset" x y :font *big-font* :color "orange")))
 ;; Now we define the main entry point for the game, the function
 ;; We set up our variables and then invoke [[file:dictionary/WITH-SESSION.html][WITH-SESSION]] to start
 ;; Xelf going.
@@ -251,7 +242,7 @@
 
 
 ;;;;;;;
-;;(walk 1)
+;;(walk 28)
 ;;(charge 29)
 ;;(known-city-edges)
 ;;*keyboard-events*
@@ -260,7 +251,7 @@
 ;;(member 'not-cops '(cops not-cops wumpus))
 ;;*congestion-city-edges*
 ;;*congestion-city-nodes*
-;;(member 132 *visited-nodes*)
+;;(member 18 *visited-nodes*)
 ;; (with-session
 ;;   (with-buffer 
 ;;       (xelf:clean-buffer (current-buffer))
@@ -271,7 +262,7 @@
 ;;(do-reset)
 ;;(at-next-update (destroy self))
 ;;(open-shell (current-buffer))
-
+;;(show-game-message 100 100 "Hello")
 
 
 

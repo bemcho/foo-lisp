@@ -39,7 +39,8 @@
         *grid-max-row-cols* grid-max-row-cols)
 
    (setf *grid-width*  (floor *width* *grid-max-row-cols*))
-   (setf *grid-height* (floor *height* *grid-max-row-cols*)))
+   (setf *grid-height* (floor *height* *grid-max-row-cols*))
+   (setf *node-to-coordinates-map* (make-hash-table :test 'equal)))
 
 (defparameter *node-to-coordinates-map* (make-hash-table :test 'equal))
 
