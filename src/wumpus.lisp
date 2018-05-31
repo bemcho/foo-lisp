@@ -243,8 +243,8 @@
 
 
 ;;;;;;;
-;;(walk 25)
-;;(charge 5)
+;;(walk 29)
+;;(charge 1)
 
 ;;(known-city-edges)
 ;;*keyboard-events*

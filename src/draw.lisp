@@ -28,14 +28,6 @@
    (z     :initform 3)   
    (last-collision :initform nil :accessor last-collision)))
 
-;; The generic function [[file:dictionary/UPDATE.html][UPDATE]] is called on each object once during
-;; each game loop.
-(defmethod update ((wumpus-hunter-sprite wumpus-hunter-sprite))
-  (with-slots (heading speed) wumpus-hunter-sprite
-    (and *player-pos*
-         (move-node-to wumpus-hunter-sprite *player-pos*))))
-
-
 (defclass wumpus-world (buffer)
   ((wumpus-hunter-sprite :initform (make-instance 'wumpus-hunter-sprite))
    (background-color :initform "black")
@@ -119,6 +111,8 @@
 (defmethod draw :after ((wumpus-world  wumpus-world))
   (show-instructions 20 20)
   (draw-nodes (known-city-edges))
+  (and *player-pos*
+       (move-node-to (first (xelf:find-instances (current-buffer) 'wumpus-hunter-sprite)) *player-pos*))
   (and *game-message* (not (= (length  *game-message*) 0))
   (show-game-message *message-box-x* *message-box-y* *game-message*)))
 
@@ -253,8 +247,6 @@
                   (y-target (y target-node))
                   (half-node (plus-half-city-node 0))
                   (cops-size (* *objects-size* 2))
-                  ;(x-half-path (plus-half-city-node (floor (max src-x (plus-half-city-node x-target)) 2)))
-                  ;(y-half-path (plus-half-city-node (floor (max src-y (plus-half-city-node y-target)) 2)))
                   (objects (cdr node-pos)))
              (draw-line src-x src-y (plus-half-city-node x-target) (plus-half-city-node y-target) :color "orange")
              (and (member 'cops objects)
