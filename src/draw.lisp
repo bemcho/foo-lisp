@@ -32,8 +32,8 @@
 ;; each game loop.
 (defmethod update ((wumpus-hunter-sprite wumpus-hunter-sprite))
   (with-slots (heading speed) wumpus-hunter-sprite
-    (and (car *visited-nodes*)
-         (move-node-to wumpus-hunter-sprite (car *visited-nodes*)))))
+    (and *player-pos*
+         (move-node-to wumpus-hunter-sprite *player-pos*))))
 
 
 (defclass wumpus-world (buffer)
@@ -47,7 +47,6 @@
 (defclass city-node (node)
   ((color :initform "gray50")
    (image :initform "city-node.png")
-   (z :initform 2)
    (objects
     :reader objects
     :writer (setf objects)
@@ -72,7 +71,8 @@
 
 (defclass cops (node)
   ((color :initform "blue")
-   (image :initform "cops.png")))
+   (image :initform "cops.png")
+   (z :initform 2)))
 
 (defclass sirens (node)
   ((color :initform "cyan")
@@ -213,7 +213,7 @@
 
 (defun draw-object(maybe-node pos)
   "Draws node and its objects"
-  (let* ((node (if maybe-node maybe-node (create-city-object pos 'city-node)))
+  (let* ((node (create-city-object pos 'city-node))
          (x (x node))
          (y (y node))
          (objs (objects node)))
@@ -235,8 +235,7 @@
   (dolist (conn-list node-list)
     (dolist (node conn-list)
       (let* ((node-pos (if (listp node) (car node) node)))
-        (draw-node node-pos)
-        ))
+        (draw-node node-pos)))
        (draw-connections conn-list)))
 
 (defun plus-half-city-node (x-or-y)
@@ -257,9 +256,9 @@
                   (cops-size (* *objects-size* 2))
                   ;(x-half-path (plus-half-city-node (floor (max src-x (plus-half-city-node x-target)) 2)))
                   ;(y-half-path (plus-half-city-node (floor (max src-y (plus-half-city-node y-target)) 2)))
-                  (cops (cdr node-pos)))
+                  (objects (cdr node-pos)))
              (draw-line src-x src-y (plus-half-city-node x-target) (plus-half-city-node y-target) :color "orange")
-             (and (member 'cops cops)
+             (and (member 'cops objects)
                   (insert (make-object (- src-x half-node) src-y cops-size cops-size 'cops))
                   (insert (make-object (- target-x half-node) target-y cops-size cops-size 'cops))))
              ))))
