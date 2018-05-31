@@ -15,6 +15,7 @@
 (defparameter *message-box-y* (- *height* 50))
 (defparameter *half-city-node* (floor *city-node-size* 2)  "in pixels")
 
+(setf xelf:*shell-enabled-p* t)
 
 
 

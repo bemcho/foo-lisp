@@ -187,7 +187,7 @@
 ;; After initializing a new Wumpus buffer, we set things up so that
 ;; pressing Control-R causes the game to reset.
 (defmethod initialize-instance :after (( wumpus-world  wumpus-world) &key)
-  (bind-event  wumpus-world '(:r :control) 'start-game))
+  (xelf:bind-event  wumpus-world '((:r."^R") :control) 'start-game))
 
 ;; Putting it all together
 
@@ -204,7 +204,7 @@
       (insert  wumpus-hunter-sprite)
       (grid-utils:config *width* *height*
                          *city-node-size* *space-btw-nodes* *padding-inside-node*
-                         *objects-size* (ceiling  (sqrt (length *congestion-city-nodes*))) *visited-nodes*)
+                         *objects-size* (ceiling  (sqrt (length *congestion-city-nodes*))))
       )))
 
 
@@ -217,7 +217,7 @@
   ;; Configure the screen dimensions
   (setf *window-title* "Grand Theft Wumpus")
   (setf *font* "sans-11")
-  (setf *frame-rate* 30)
+  (setf *frame-rate* 5)
   (setf *font-texture-scale* 1)
   (setf *font-texture-filter* :linear)
   (setf *screen-width* *width*)
@@ -243,7 +243,7 @@
 
 
 ;;;;;;;
-;;(walk 29)
+;;(walk 14)
 ;;(charge 1)
 
 ;;(known-city-edges)

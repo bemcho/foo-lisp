@@ -96,17 +96,18 @@
    (image :initform "question-mark.png")
    ))
 
+(defun handle-click-city-node (args)
+  "doc"
+  (draw-string (format nil "~a" args)  100 100))
+
+(defmethod initialize-instance :after ((city-node city-node) &key)
+  (xelf:bind-event  city-node '(:left :mouse-button-down-event) 'handle-click-city-node))
 ;;
 (defun make-object (x y width height object-type)
   (let*((obj (make-instance object-type)))
     (resize obj width height)
     (move-to obj x y)
     obj))
-
-(defun show-instructions (x y)
-  "Draws instructions starting from x y"
-  (with-buffer (current-buffer)
-    (draw-string "2 blood nodes away is the wumpus.2 lights nodes away is some Glow Worms Gang.You see siren on the next one you are busted by cops. Kill the wumpus with right click or charge." x y :font *big-font* :color "orange")))
 
 (defmethod draw :after ((wumpus-world  wumpus-world))
   (show-instructions 20 20)
@@ -132,17 +133,11 @@
 
 ;; The ball should emit a retro beep when colliding with any node. We
 ;; use [[file:dictionary/DEFRESOURCE.html][DEFRESOURCE]] to let Xelf know about the sound file.
-(defparameter *keyboard-events* '()
-  "doc")
 
+;(assoc ':r *keyboard-events* :key #'car :test #'equal)
 (defmethod handle-event :around ((self buffer) event)
-  (pushnew event *keyboard-events*))
-
-(defparameter *node-events* '()
-  "doc")
-
-(defmethod handle-event :around ((self node) event)
-  (pushnew event *node-events*))
+  (if (assoc ':r event :test #'equal)
+      (start-game (current-buffer))))
 
 (defmethod collide :after((wumpus-hunter-sprite wumpus-hunter-sprite) (node node)))
 
@@ -202,6 +197,7 @@
            (lol-node (assoc pos *congestion-city-nodes*)))
       (setf (node-number new-node) pos)
       (setf (objects new-node) (rest lol-node))
+      (bind-event new-node '(:mouse-button-down-event) 'handle-click-city-node)
       new-node)))
 
 (defun draw-object(maybe-node pos)
@@ -261,7 +257,7 @@
 (defun show-instructions (x y)
   "Draws instructions starting from x y"
   (with-buffer (current-buffer)
-    (draw-string "2 nodes with Blood away is the wumpus.2 nodes with Lights away is some Glow Worms Gang.1 siren on the next one you are busted by cops.Kill the wumpus with RMB.(ctrl r) to reset" x y :font *big-font* :color "orange")))
+    (draw-string "2 nodes with Blood away is the wumpus.2 nodes with Lights away is some Glow Worms Gang.1 siren on the next one you are busted by cops.Kill the wumpus with RMB.(press r) to reset" x y :font *big-font* :color "orange")))
 
 (defun  node-pos-to-node(pos)
   "doc"
