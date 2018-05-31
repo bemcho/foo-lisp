@@ -197,11 +197,11 @@
 
 (defmethod start-game ((wumpus-world  wumpus-world))
   (with-slots (wumpus-hunter-sprite) wumpus-world
+    (new-game)
     (with-buffer wumpus-world
       (xelf:do-nodes  (node wumpus-world)
         (xelf:remove-node wumpus-world node))
       (insert  wumpus-hunter-sprite)
-      (new-game)
       (grid-utils:config *width* *height*
                          *city-node-size* *space-btw-nodes* *padding-inside-node*
                          *objects-size* (ceiling  (sqrt (length *congestion-city-nodes*))) *visited-nodes*)
@@ -243,7 +243,7 @@
 
 
 ;;;;;;;
-;;(walk 25)
+;;(walk 18)
 ;;(charge 15)
 
 ;;(known-city-edges)

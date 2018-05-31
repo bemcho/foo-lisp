@@ -25,14 +25,15 @@
    (color :initform "red")
    (speed :initform 0)
    (count :initform 0)
+   (z     :initform 3)   
    (last-collision :initform nil :accessor last-collision)))
 
 ;; The generic function [[file:dictionary/UPDATE.html][UPDATE]] is called on each object once during
 ;; each game loop.
 (defmethod update ((wumpus-hunter-sprite wumpus-hunter-sprite))
   (with-slots (heading speed) wumpus-hunter-sprite
-    (and *player-pos*
-         (move-node-to wumpus-hunter-sprite *player-pos*))))
+    (and (car *visited-nodes*)
+         (move-node-to wumpus-hunter-sprite (car *visited-nodes*)))))
 
 
 (defclass wumpus-world (buffer)
@@ -46,6 +47,7 @@
 (defclass city-node (node)
   ((color :initform "gray50")
    (image :initform "city-node.png")
+   (z :initform 2)
    (objects
     :reader objects
     :writer (setf objects)
@@ -164,43 +166,13 @@
          ((eql wumpus-city-symbol '?) 'question-mark)
         ))
 
-(defun insert-objects (x y objects)
-  "Inserts objects starting from x,y"
-  (let ((counter 0))
-    (dolist (obj objects)
-      (let* ((xo (grid-utils:get-next-x (+ x *padding-inside-node*) counter))
-             (yo (grid-utils:get-next-y (+ y *padding-inside-node*) counter)))
-        (insert (make-object xo yo  *objects-size*  *objects-size* (get-class-for obj)))
-        (incf counter)))))
-
 (defun draw-cloud-background ()
   "Draws mist per row"
   (let ((x 0)
         (y 0))
-      (dotimes (n 10)
-        (insert (make-object x y (* *city-node-size*  (random 15)) (* *city-node-size* (random 4)) 'cloud))
-        (setf y (* n *city-node-size*)))))
-
-
-
-(defun draw-object(maybe-node pos)
-  "Draws node and its objects"
-  (multiple-value-bind (x y)
-      (grid-utils:get-nth-grid-box-coord pos)
-  (let* ((node (if maybe-node maybe-node (make-object x y *city-node-size* *city-node-size* 'city-node)))
-         (node-pos (setf (node-number node) pos))
-         (x (x node))
-         (y (y node))
-         (objs (objects node)))
-    (and node
-         (progn
-           (if (member node-pos *visited-nodes*)
-               (progn (insert node) (and objs  (insert-objects x y objs)))
-               (let* ((n (make-object x y (width node) (height node) 'question-mark)))
-                 (setf (node-number n) pos)
-                 (insert n)))
-           (draw-string (write-to-string node-pos) x y :font *big-font* :color "white")
-           )))))
+    (dotimes (n 10)
+      (insert (make-object x y (* *city-node-size*  (random 15)) (* *city-node-size* (random 4)) 'cloud))
+      (setf y (* n *city-node-size*)))))
 
 (defun populate-city (city-nodes)
   (with-new-buffer
@@ -218,6 +190,40 @@
           )))
     (current-buffer)))
 
+(defun insert-objects (x y objects)
+  "Inserts objects starting from x,y"
+  (let ((counter 0))
+    (dolist (obj objects)
+      (let* ((xo (grid-utils:get-next-x (+ x *padding-inside-node*) counter))
+             (yo (grid-utils:get-next-y (+ y *padding-inside-node*) counter)))
+        (insert (make-object xo yo  *objects-size*  *objects-size* (get-class-for obj)))
+        (incf counter)))))
+;;(assoc 23 *congestion-city-nodes*)
+
+(defun create-city-object (pos type)
+  "Creates instance of type on position pos taking the contents of *congestion-city-nodes*"
+  (multiple-value-bind (x y)
+      (grid-utils:get-nth-grid-box-coord pos)
+    (let* ((new-node (make-object x y *city-node-size* *city-node-size* type))
+           (lol-node (assoc pos *congestion-city-nodes*)))
+      (setf (node-number new-node) pos)
+      (setf (objects new-node) (rest lol-node))
+      new-node)))
+
+
+(defun draw-object(maybe-node pos)
+  "Draws node and its objects"
+  (let* ((node (if maybe-node maybe-node (create-city-object pos 'city-node)))
+         (x (x node))
+         (y (y node))
+         (objs (objects node)))
+    (and node
+         (progn
+           (if (member pos *visited-nodes*)
+               (progn (insert node) (and objs  (insert-objects x y objs)))
+               (insert (create-city-object pos 'question-mark)))
+           (draw-string (write-to-string pos) x y :font *big-font* :color "white")
+           ))))
 
 (defun draw-node (node-pos)
   "doc"
