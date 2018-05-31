@@ -157,18 +157,20 @@
   (handle-direction pos t))
 
 (defun handle-direction (pos charging)
-  (let ((edge (assoc pos (cdr (assoc *player-pos* *congestion-city-edges*)))))
+  (let ((edge (assoc pos (cdr (assoc *player-pos* *congestion-city-edges*))))
+        (connections (cdr (assoc *player-pos* *congestion-city-edges*))))
     (if edge
         (handle-new-place edge pos charging)
-        (setf *game-message* (format nil "You can't go there ->  position: [~d]" pos)))))
+        (setf *game-message* (format nil "You can't go there ->  position: [~d] you can go to: ~a" pos connections)))))
 
 (defun handle-new-place (edge pos charging)
   (let* ((node (assoc pos *congestion-city-nodes*))
+         (connections (mapcar #'car (cdr (assoc *player-pos* *congestion-city-edges*))))
          (has-worm (and (member 'glow-worm node)
                         (not (member pos *visited-nodes*)))))
     (pushnew pos *visited-nodes*)
     (setf *player-pos* pos)
-    (setf *game-message*  (format nil  "You are on node [ ~d ]  with ~a" pos (rest node)))
+    (setf *game-message*  (format nil  "You are on position [~d] with ~a." pos (rest node) connections))
     ;;(draw-known-city)
     (cond ((member 'cops edge) (setf *game-message* "You ran into the cops. Game Over."))
           ((member 'wumpus node) (if charging
@@ -241,8 +243,9 @@
 
 
 ;;;;;;;
-;;(walk 24)
+;;(walk 25)
 ;;(charge 15)
+
 ;;(known-city-edges)
 ;;*keyboard-events*
 ;;*node-events*
