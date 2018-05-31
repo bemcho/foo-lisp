@@ -198,8 +198,8 @@
 (defmethod start-game ((wumpus-world  wumpus-world))
   (with-slots (wumpus-hunter-sprite) wumpus-world
     (with-buffer wumpus-world
-      (xelf:do-nodes  (node wumpus-world)
-        (xelf:remove-node wumpus-world node))
+      (xelf:do-nodes  (node (current-buffer))
+        (xelf:remove-node (current-buffer) node))
       (new-game)
       (insert  wumpus-hunter-sprite)
       (grid-utils:config *width* *height*
@@ -217,7 +217,7 @@
   ;; Configure the screen dimensions
   (setf *window-title* "Grand Theft Wumpus")
   (setf *font* "sans-11")
-  (setf *frame-rate* 5)
+  (setf *frame-rate* 30)
   (setf *font-texture-scale* 1)
   (setf *font-texture-filter* :linear)
   (setf *screen-width* *width*)
@@ -243,8 +243,8 @@
 
 
 ;;;;;;;
-;;(walk 13)
-;;(charge 3)
+;;(walk 25)
+;;(charge 5)
 
 ;;(known-city-edges)
 ;;*keyboard-events*
@@ -267,6 +267,7 @@
 ;;(open-shell (current-buffer))
 ;;(show-game-message 100 100 "Hello")
 ;;(wumpus-game)
+;;(remove-node (current-buffer) (node-pos-to-node 16))
 
 
 

@@ -210,20 +210,19 @@
       (setf (objects new-node) (rest lol-node))
       new-node)))
 
-
 (defun draw-object(maybe-node pos)
   "Draws node and its objects"
-  (let* ((node (create-city-object pos 'city-node))
-         (x (x node))
-         (y (y node))
-         (objs (objects node)))
-    (and node
-         (progn
-           (if (member pos *visited-nodes*)
-               (progn (insert node) (and objs  (insert-objects x y objs)))
-               (insert (create-city-object pos 'question-mark)))
-           (draw-string (write-to-string pos) x y :font *big-font* :color "white")
-           ))))
+  (let* ((node (node-pos-to-node pos)))
+    (and node  (remove-node (current-buffer) node))
+    (let* ((new-node   (if (member pos *visited-nodes*)
+                           (create-city-object pos 'city-node)
+                           (create-city-object pos 'question-mark)))
+           (x (x new-node))
+           (y (y new-node))
+           (objs (if (member pos *visited-nodes*) (objects new-node) nil)))
+      (insert new-node)
+      (and objs (insert-objects x y objs))
+      (draw-string (write-to-string pos) x y :font *big-font* :color "white"))))
 
 (defun draw-node (node-pos)
   "doc"
@@ -263,7 +262,6 @@
                   (insert (make-object (+ target-x half-node) target-y cops-size cops-size 'cops))))
              ))))
 
-
 (defun show-game-message (x y msg)
   "Shows msg starting with x y"
   (draw-string msg x y :font *big-font* :color "red"))
@@ -276,9 +274,9 @@
 (defun  node-pos-to-node(pos)
   "doc"
   (car (member pos
-               (xelf:find-instances (xelf:current-buffer) 'city-node )
-               :key #'(lambda (n) (node-number (if (listp n)(car n) n))))))
-
+               (xelf:find-instances (xelf:current-buffer) 'city-node)
+               :key #'(lambda (n) (node-number (if (listp n)(car n) n)))
+               :test #'equal)))
 
 (defun move-node-to (node node-pos)
   "doc"
