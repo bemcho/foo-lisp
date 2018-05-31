@@ -243,7 +243,7 @@
 
 
 ;;;;;;;
-;;(walk 29)
+;;(walk 13)
 ;;(charge 3)
 
 ;;(known-city-edges)

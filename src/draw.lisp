@@ -259,8 +259,8 @@
                   (objects (cdr node-pos)))
              (draw-line src-x src-y (plus-half-city-node x-target) (plus-half-city-node y-target) :color "orange")
              (and (member 'cops objects)
-                  (insert (make-object (- src-x half-node) src-y cops-size cops-size 'cops))
-                  (insert (make-object (- target-x half-node) target-y cops-size cops-size 'cops))))
+                  (insert (make-object (+ src-x half-node) src-y cops-size cops-size 'cops))
+                  (insert (make-object (+ target-x half-node) target-y cops-size cops-size 'cops))))
              ))))
 
 
