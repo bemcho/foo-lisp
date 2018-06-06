@@ -5,7 +5,8 @@
   (:export #:say #:ugraph->png #:new-game #:wumpus-game #:agent))
 
 (defpackage   #:aima
-  (:use       #:cl)
+  (:use       #:cl )
+  (:export #:test)
   (:documentation "doc"))
 
 

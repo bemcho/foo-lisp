@@ -5,11 +5,12 @@
   :license  "Specify license here"
   :version "0.0.1"
   :serial t
-  :depends-on (#:xelf #:inferior-shell)
+  :depends-on (#:xelf #:inferior-shell )
   :components ((:module "src"
                         :components
                         ((:file "package")
-                         (:file "util")  
+                         (:file "util")
+                         (:file "aima")
                          (:file "config")
                          (:file "grid-utils")
                          (:file "draw")  
@@ -38,7 +39,7 @@
                                             :components
                                             ((:file "basic-env")
                                              (:file "grid-env":depends-on ("basic-env"))
-                                             (:file "vacuum":depends-on ("basic-env"))
+                                             (:file "vacuum")
                                              (:file "wumpus":depends-on ("basic-env"))))
                                    (:file "test-agents")))))
                (:module "static")

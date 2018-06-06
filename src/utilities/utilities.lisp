@@ -9,7 +9,10 @@
 (in-package #:aima)
 
 
-
+(defmethod print-structure ((structure-object t) stream)
+  "Print a structure.  You can specialize this function.
+  It will be called to print anything defined with DEFSTRUCTURE."
+  (format stream "#<a ~A>" (type-of structure-object)))
 ;; (eval-when (eval compile load)
 ;;   ;; Make it ok to place a function definition on a built-in LISP symbol.
 ;;   #+(or Allegro EXCL)
@@ -453,71 +456,71 @@ Expressions are used in Logic, and as actions for agents."
 
 ;;;; Testing Tool: deftest and test
 
-;; (defmacro deftest (name &rest examples)
-;;   "Define a set of test examples.  Each example is of the form (exp test)
-;;   or (exp).  Evaluate exp and see if the result passes the test. Within the
-;;   test, the result is bound to *.  Te example ((f 2))) has no test to
-;;   fail, so it alweays passes the test.  But ((+ 2 2) (= * 3)) has the test
-;;   (= * 3), which fails because * will be bound to the result 4, so the test
-;;   fails.  Call (TEST name) to count how many tests are failed within the
-;;   named test.  NAME is the name of an aima-system."
-;;   `(add-test ',name ',examples))
+(defmacro deftest (name &rest examples)
+  "Define a set of test examples.  Each example is of the form (exp test)
+  or (exp).  Evaluate exp and see if the result passes the test. Within the
+  test, the result is bound to *.  Te example ((f 2))) has no test to
+  fail, so it alweays passes the test.  But ((+ 2 2) (= * 3)) has the test
+  (= * 3), which fails because * will be bound to the result 4, so the test
+  fails.  Call (TEST name) to count how many tests are failed within the
+  named test.  NAME is the name of an aima-system."
+  `(add-test ',name ',examples))
 
-;; (defun add-test (name examples)
-;;   "The functional interface for deftest: adds test examples to a system."
-;;   (let ((system (or (get-aima-system name)
-;; 		    (add-aima-system :name name :examples examples))))
-;;     (setf (aima-system-examples system) examples))
-;;   name)
+(defun add-test (name examples)
+  "The functional interface for deftest: adds test examples to a system."
+  (let ((system (or (get-aima-system name)
+		    (add-aima-system :name name :examples examples))))
+    (setf (aima-system-examples system) examples))
+  name)
 
-;; (defun test (&optional (name 'all) (print? 't))
-;;   "Run a test suite and sum the number of errors.  If all is well, this
-;;   should return 0.  The second argument says what to print: nil for
-;;   nothing, t for everything, or FAIL for just those examples that fail.
-;;   If there are no test examples in the named system, put the system has
-;;   other systems as parts, run the tests for all those and sum the result."
-;;   (let ((*print-pretty* t)
-;; 	(*standard-output* (if print? *standard-output*
-;; 			     (make-broadcast-stream)))
-;; 	(system (aima-load-if-unloaded name)))
-;;     (cond ((null system) (warn "No such system as ~A." name))
-;; 	  ((and (null (aima-system-examples system))
-;; 		(every #'symbolp (aima-system-parts system)))
-;; 	   (sum  (aima-system-parts system)
-;; 		 #'(lambda (part) (test part print?))))
-;;           (t (when print? (format t "Testing System ~A~%" name))
-;; 	     (let ((errors (count-if-not #'(lambda (example) 
-;; 					     (test-example example print?))
-;; 			   (aima-system-examples system))))
-;; 	       (format *debug-io* "~%~2D error~P on system ~A~%"
-;; 		       errors errors name)
-;; 	       errors)))))
+(defun test (&optional (name 'all) (print? 't))
+  "Run a test suite and sum the number of errors.  If all is well, this
+  should return 0.  The second argument says what to print: nil for
+  nothing, t for everything, or FAIL for just those examples that fail.
+  If there are no test examples in the named system, put the system has
+  other systems as parts, run the tests for all those and sum the result."
+  (let ((*print-pretty* t)
+	(*standard-output* (if print? *standard-output*
+			     (make-broadcast-stream)))
+	(system (aima-load-if-unloaded name)))
+    (cond ((null system) (warn "No such system as ~A." name))
+	  ((and (null (aima-system-examples system))
+		(every #'symbolp (aima-system-parts system)))
+	   (sum  (aima-system-parts system)
+		 #'(lambda (part) (test part print?))))
+          (t (when print? (format t "Testing System ~A~%" name))
+	     (let ((errors (count-if-not #'(lambda (example) 
+					     (test-example example print?))
+			   (aima-system-examples system))))
+	       (format *debug-io* "~%~2D error~P on system ~A~%"
+		       errors errors name)
+	       errors)))))
 
-;; (defun test-example (example &optional (print? t))
-;;   "Does the EXP part of this example pass the TEST?"
-;;   (if (stringp example)
-;;       (progn
-;;         (when (eq print? t)
-;;           (format t "~&;;; ~A~%" example))
-;;         t)
-;;     (let* ((exp (first example))
-;; 	   (* nil)
-;; 	   (test (cond ((null (second example)) t)
-;; 		       ((constantp (second example))
-;; 			`(equal * ,(second example)))
-;; 		       (t (second example))))
-;;            test-result)
-;;       (when (eq print? t)
-;;         (format t "~&> ~S~%" exp))
-;;       (setf * (eval exp))
-;;       (when (eq print? t)
-;;         (format t "~&~S~%" *))
-;;       (setf test-result (eval test))
-;;       (when (null test-result)
-;;         (case print?
-;;           ((FAIL) (format t "~&;;; FAILURE on ~S; expected ~S, got:~%;;; ~S~%"
-;;                           exp test *))
-;;           ((T) (format t "~&;;; FAILURE: expected ~S" test))
-;;           (otherwise)))
-;;       test-result)))
+(defun test-example (example &optional (print? t))
+  "Does the EXP part of this example pass the TEST?"
+  (if (stringp example)
+      (progn
+        (when (eq print? t)
+          (format t "~&;;; ~A~%" example))
+        t)
+    (let* ((exp (first example))
+	   (* nil)
+	   (test (cond ((null (second example)) t)
+		       ((constantp (second example))
+			`(equal * ,(second example)))
+		       (t (second example))))
+           test-result)
+      (when (eq print? t)
+        (format t "~&> ~S~%" exp))
+      (setf * (eval exp))
+      (when (eq print? t)
+        (format t "~&~S~%" *))
+      (setf test-result (eval test))
+      (when (null test-result)
+        (case print?
+          ((FAIL) (format t "~&;;; FAILURE on ~S; expected ~S, got:~%;;; ~S~%"
+                          exp test *))
+          ((T) (format t "~&;;; FAILURE: expected ~S" test))
+          (otherwise)))
+      test-result)))
   
