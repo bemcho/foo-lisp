@@ -2,9 +2,6 @@
   (:use #:cl)
   (:export
    #:config
-   #:node-pos-to-node
-   #:set-node-mapping
-   #:move-node-to
    #:get-nth-grid-box-coord
    #:get-next-x
    #:get-next-y))
@@ -40,7 +37,7 @@
 
    (setf *grid-width*  (floor *width* *grid-max-row-cols*))
    (setf *grid-height* (floor *height* *grid-max-row-cols*))
-   (setf *node-to-coordinates-map* (make-hash-table :test 'equal)))
+)
 
 ;; 2D grid utils
 

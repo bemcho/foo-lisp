@@ -78,10 +78,6 @@
   ((color :initform "pink")
    (image :initform "lights.png")))
 
-(defclass wall (node)
-  ((color :initform "gray50")
-   (image :initform "wall.png")))
-
 (defclass mist (node)
   ((color :initform "gray50")
    (image :initform "mist.png")))
@@ -122,12 +118,12 @@
 ;; collide during that frame.
 
 
-(defmethod collide ((wumpus-hunter-sprite wumpus-hunter-sprite) (wall wall))
-  (with-slots (heading speed x y) wumpus-hunter-sprite
-    ;; back away from wall
-    (move wumpus-hunter-sprite (opposite-heading heading) speed)
-    ;; sometimes choose another direction to prevent getting stuck
-    (percent-of-time 10 (incf heading (radian-angle 90)))))
+;; (defmethod collide ((wumpus-hunter-sprite wumpus-hunter-sprite) (wall wall))
+;;   (with-slots (heading speed x y) wumpus-hunter-sprite
+;;     ;; back away from wall
+;;     (move wumpus-hunter-sprite (opposite-heading heading) speed)
+;;     ;; sometimes choose another direction to prevent getting stuck
+;;     (percent-of-time 10 (incf heading (radian-angle 90)))))
 
 ;; Making noise
 
