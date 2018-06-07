@@ -30,7 +30,7 @@
   (stream t)         ;; Stream to display output on
   (initialized nil)  ;; Have we run initialize on this environment yet?
   (state nil)        ;; Current state of the environment; other subtypes
-                     ;; add new slots to hold various state information
+  ;; add new slots to hold various state information
   )
 
 ;;;; Top level functions
@@ -45,14 +45,14 @@
     (incf (environment-step env))
     ;; Deliver percept and get action from each agent
     (for each agent in (environment-agents env) do
-	 (setf (agent-percept agent) (get-percept env agent))
-	 (setf (agent-action agent) 
-	       (funcall (agent-program agent) (agent-percept agent))))
+        (setf (agent-percept agent) (get-percept env agent))
+      (setf (agent-action agent) 
+            (funcall (agent-program agent) (agent-percept agent))))
     ;; Execute the actions and otherwise update the world
     (update-fn env)
     ;; Update the agent scores, then optionally display the current state
     (for each agent in (environment-agents env) do
-	 (setf (agent-score agent) (performance-measure env agent)))
+        (setf (agent-score agent) (performance-measure env agent)))
     (display-environment env)
     (when (termination? env) (RETURN)))
   env)
@@ -117,10 +117,10 @@
       (format stream "~&At Time step ~D:~%" (environment-step env))
       (when (> (environment-step env) 0)
 	(for each agent in (environment-agents env) do
-	     (format stream 
-		     "~&Agent ~A perceives ~A~%~6Tand does ~A~%"
-		     agent (agent-percept agent)
-		     (agent-action agent))))
+            (format stream 
+                    "~&Agent ~A perceives ~A~%~6Tand does ~A~%"
+                    agent (agent-percept agent)
+                    (agent-action agent))))
       (display-environment-snapshot env))))
 
 (defmethod display-environment-snapshot ((env environment))
@@ -144,12 +144,12 @@
   ;; same environment-fn.
   (let ((total 0) (score 0))
     (for i = 1 to n do
-	 (let* ((env (let ((*random-state* env-gen-random-state))
-		       (funcall environment-fn 
-				:stream nil
-				:aspec (list agent-type)))))
-	   (run-environment env)
-	   (incf total (agent-score (first (environment-agents env))))))
+      (let* ((env (let ((*random-state* env-gen-random-state))
+                    (funcall environment-fn 
+                             :stream nil
+                             :aspec (list agent-type)))))
+        (run-environment env)
+        (incf total (agent-score (first (environment-agents env))))))
     (setf score (float (/ total n)))
     (format t "~&~10,2F average for ~A" score agent-type)
     score))
@@ -158,9 +158,9 @@
   "Each agent (if the agent is alive and has specified a legal action)
   takes the action."
   (for each agent in (environment-agents env) do
-       (let ((act (agent-action agent)))
-	 (when (member (op act) (legal-actions env))
-	   (apply (op act) env (agent-body agent) (args act))))))
+      (let ((act (agent-action agent)))
+        (when (member (op act) (legal-actions env))
+          (apply (op act) env (agent-body agent) (args act))))))
 
 (defmethod print-structure ((env environment) stream)
   (format stream "#<~A; Step: ~D, Agents:~{ ~A~}>"

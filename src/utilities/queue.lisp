@@ -39,7 +39,7 @@
   "Remove the element from the front of the queue and return it."
   (if (listp (q-elements q))
       (pop (q-elements q))
-    (heap-extract-min (q-elements q) (q-key q))))
+      (heap-extract-min (q-elements q) (q-key q))))
 
 ;;;; The Three Enqueing Functions
 
@@ -65,7 +65,7 @@
     (setf (q-elements q) (make-heap)))
   ;; Now insert the items
   (for each item in items do
-       (heap-insert (q-elements q) item key)))
+      (heap-insert (q-elements q) item key)))
 
 ;;;; The Heap Implementation of Priority Queues
 
@@ -114,8 +114,8 @@
   (let ((i (- (length heap) 1))
 	(val (funcall key item)))
     (while (and (> i 0) (>= (heap-val heap (heap-parent i) key) val))
-      do (setf (aref heap i) (aref heap (heap-parent i))
-	       i (heap-parent i)))
+        do (setf (aref heap i) (aref heap (heap-parent i))
+                 i (heap-parent i)))
     (setf (aref heap i) item)))
 
 (defun make-heap (&optional (size 100))

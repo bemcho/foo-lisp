@@ -111,7 +111,7 @@
   (and *player-pos*
        (move-node-to (first (xelf:find-instances (current-buffer) 'wumpus-hunter-sprite)) *player-pos*))
   (and *game-message* (not (= (length  *game-message*) 0))
-  (show-game-message *message-box-x* *message-box-y* *game-message*)))
+       (show-game-message *message-box-x* *message-box-y* *game-message*)))
 
 ;; We want the ball to bounce off of the walls. The [[file:dictionary/COLLIDE.html][COLLIDE]] method is
 ;; called for every frame on all pairs of objects whose bounding boxes
@@ -130,7 +130,7 @@
 ;; The ball should emit a retro beep when colliding with any node. We
 ;; use [[file:dictionary/DEFRESOURCE.html][DEFRESOURCE]] to let Xelf know about the sound file.
 
-;(assoc ':r *keyboard-events* :key #'car :test #'equal)
+                                        ;(assoc ':r *keyboard-events* :key #'car :test #'equal)
 (defmethod handle-event :around ((self buffer) event)
   (if (assoc ':r event :test #'equal)
       (start-game (current-buffer))))
@@ -148,7 +148,7 @@
         ((eql wumpus-city-symbol 'WUMPUS) 'wumpus)
         ((eql wumpus-city-symbol 'GLOW-WORM) 'glowworm)
         ((eql wumpus-city-symbol 'COPS) 'cops)
-         ((eql wumpus-city-symbol '?) 'question-mark)
+        ((eql wumpus-city-symbol '?) 'question-mark)
         ))
 
 (defun draw-cloud-background ()
@@ -213,7 +213,7 @@
 (defun draw-node (node-pos)
   "doc"
   (let ((current-node (node-pos-to-node node-pos)))
-       (draw-object current-node node-pos)))
+    (draw-object current-node node-pos)))
 
 (defun draw-nodes (node-list)
   "doc"
@@ -221,7 +221,7 @@
     (dolist (node conn-list)
       (let* ((node-pos (if (listp node) (car node) node)))
         (draw-node node-pos)))
-       (draw-connections conn-list)))
+    (draw-connections conn-list)))
 
 (defun plus-half-city-node (x-or-y)
   (+ x-or-y (floor *city-node-size* 2)))
@@ -244,7 +244,7 @@
              (and (member 'cops objects)
                   (insert (make-object (+ src-x half-node) src-y cops-size cops-size 'cops))
                   (insert (make-object (+ target-x half-node) target-y cops-size cops-size 'cops))))
-             ))))
+           ))))
 
 (defun show-game-message (x y msg)
   "Shows msg starting with x y"
@@ -266,9 +266,9 @@
   "doc"
   (let ((hunter-node (node-pos-to-node node-pos)))
     (and hunter-node node
-      (xelf:move-to node
-                (+ (xelf:x hunter-node) *half-city-node*)
-                (+ (xelf:y hunter-node) *half-city-node*)))))
+         (xelf:move-to node
+                       (+ (xelf:x hunter-node) *half-city-node*)
+                       (+ (xelf:y hunter-node) *half-city-node*)))))
 
 
 

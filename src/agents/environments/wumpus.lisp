@@ -4,13 +4,13 @@
 (in-package #:aima)
 
 (defstruct (wumpus-world (:include grid-environment
-    (size (@ 6 6))
-    (aspec '(aimless-wumpus-agent))
-    (bspec '((at edge wall) (* 1 gold) (* 1 wumpus) (at all (p 0.2 pit))))))
+                                   (size (@ 6 6))
+                                   (aspec '(aimless-wumpus-agent))
+                                   (bspec '((at edge wall) (* 1 gold) (* 1 wumpus) (at all (p 0.2 pit))))))
   "A dangerous world with pits and wumpuses, and some gold.")
 
 (defstruct (wumpus-agent-body (:include agent-body
-    (contents (list (make-arrow)))))
+                                        (contents (list (make-arrow)))))
   "The default wumpus agent body is given an arrow.")
 
 (defstruct (gold   (:include object (name "$") (size 0.1))))
@@ -23,11 +23,11 @@
 (defmethod update-fn ((env wumpus-world))
   ;; See if anyone died
   (for each agent in (environment-agents env) do
-       (when (find-object-if #'deadly? (object-loc (agent-body agent)) env)
-	 (kill (agent-body agent))))
+      (when (find-object-if #'deadly? (object-loc (agent-body agent)) env)
+        (kill (agent-body agent))))
   ;; Sounds dissipate
   (for each object in (grid-environment-objects env) do
-       (setf (object-sound object) nil))
+      (setf (object-sound object) nil))
   ;; Do the normal thing
   (call-next-method))
 

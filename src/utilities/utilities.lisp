@@ -58,10 +58,10 @@
       (get-setf-expansion sequence env)
     (assert (= (length stores) 1))
     (let ((item-var (gensym "ITEM")))
-    `(let* ((,item-var ,item)
-	    ,@(mapcar #'list temps vals)
-	    (,(first stores) (delete ,item-var ,access-form ,@keys)))
-      ,store-form))))
+      `(let* ((,item-var ,item)
+              ,@(mapcar #'list temps vals)
+              (,(first stores) (delete ,item-var ,access-form ,@keys)))
+         ,store-form))))
 
 (defmacro define-if-undefined (&rest definitions)
   "Use this to conditionally define functions, variables, or macros that
@@ -73,7 +73,7 @@
 		     `(when (not (or (boundp ',name) (fboundp ',name)
 				     (special-form-p ',name)
 				     (macro-function ',name)))
-		       ,def)))
+                        ,def)))
 	       definitions)))
 
 ;;;; List Utilities
@@ -144,7 +144,7 @@ Expressions are used in Logic, and as actions for agents."
   "Insert item between every element of list."
   (if (or (null list) (length=1 list))
       list
-    (list* (first list) item (insert-between item (rest list)))))
+      (list* (first list) item (insert-between item (rest list)))))
 
 ;;;; Functions for manipulating 2-dimensional points 
 
@@ -246,7 +246,7 @@ Expressions are used in Logic, and as actions for agents."
     result))
 
 (defun sample-without-replacement (n population &optional
-				     (m (length population)))
+                                                  (m (length population)))
   ;; Assumes that m = (length population)
   (cond ((<= n 0) nil)
 	((>= n m) population)
@@ -317,26 +317,26 @@ Expressions are used in Logic, and as actions for agents."
     ;; Print the header
     (format stream "~&") (print-repeated " " width stream)
     (for x = 0 to max-x do
-	 (format stream "|") (print-dashes width stream))
+      (format stream "|") (print-dashes width stream))
     (format stream "|~%")
     ;; Print each row
     (for y1 = 0 to max-y do
-	 (let ((y (- max-y y1)))
-	   (print-centered y width stream)
-	   ;; Print each location
-	   (for x = 0 to max-x do
-		(format stream "|")
-		(print-centered (funcall key (aref array x y)) width stream))
-	   (format stream "|~%") 
-	   ;; Print a dashed line
-	   (print-repeated " " width stream)
-	   (for x = 0 to max-x do
-		(format stream "|") (print-dashes width stream)))
-	 (format stream "|~%"))
+      (let ((y (- max-y y1)))
+        (print-centered y width stream)
+        ;; Print each location
+        (for x = 0 to max-x do
+          (format stream "|")
+          (print-centered (funcall key (aref array x y)) width stream))
+        (format stream "|~%") 
+        ;; Print a dashed line
+        (print-repeated " " width stream)
+        (for x = 0 to max-x do
+          (format stream "|") (print-dashes width stream)))
+      (format stream "|~%"))
     ;; Print the X-coordinates along the bottom
     (print-repeated " " width stream)
     (for x = 0 to max-x do
-	 (format stream " ") (print-centered x width stream))
+      (format stream " ") (print-centered x width stream))
     array))
 
 (defun print-centered (string width &optional (stream t))
@@ -360,17 +360,17 @@ Expressions are used in Logic, and as actions for agents."
 ;;;; Assorted conversion utilities and predicates
 
 (defun copy-array (a &aux (dim (array-dimensions a))
-                          (b (make-array dim)))
+                       (b (make-array dim)))
   "Make a copy of an array."
   (copy-subarray a b nil dim)
   b)
 
 (defun copy-subarray (a b indices dim)
   (if dim
-    (dotimes (i (first dim))
-      (copy-subarray a b (append indices (list i)) (rest dim)))
-    (setf (apply #'aref (cons b indices))
-          (apply #'aref (cons a indices)))))
+      (dotimes (i (first dim))
+        (copy-subarray a b (append indices (list i)) (rest dim)))
+      (setf (apply #'aref (cons b indices))
+            (apply #'aref (cons a indices)))))
 
 (defun array->vector (array)
   "Convert a multi-dimensional array to a vector with the same elements."
@@ -379,7 +379,7 @@ Expressions are used in Logic, and as actions for agents."
 
 (defun plot-alist (alist file)
   (with-open-file (stream file :direction :output :if-does-not-exist :create
-                     :if-exists :supersede)
+                          :if-exists :supersede)
     (dolist (xy alist)
       (format stream "~&~A ~A~%" (car xy) (cdr xy)))))
 
@@ -481,7 +481,7 @@ Expressions are used in Logic, and as actions for agents."
   other systems as parts, run the tests for all those and sum the result."
   (let ((*print-pretty* t)
 	(*standard-output* (if print? *standard-output*
-			     (make-broadcast-stream)))
+                               (make-broadcast-stream)))
 	(system (aima-load-if-unloaded name)))
     (cond ((null system) (warn "No such system as ~A." name))
 	  ((and (null (aima-system-examples system))
@@ -491,7 +491,7 @@ Expressions are used in Logic, and as actions for agents."
           (t (when print? (format t "Testing System ~A~%" name))
 	     (let ((errors (count-if-not #'(lambda (example) 
 					     (test-example example print?))
-			   (aima-system-examples system))))
+                                         (aima-system-examples system))))
 	       (format *debug-io* "~%~2D error~P on system ~A~%"
 		       errors errors name)
 	       errors)))))
@@ -503,24 +503,24 @@ Expressions are used in Logic, and as actions for agents."
         (when (eq print? t)
           (format t "~&;;; ~A~%" example))
         t)
-    (let* ((exp (first example))
-	   (* nil)
-	   (test (cond ((null (second example)) t)
-		       ((constantp (second example))
-			`(equal * ,(second example)))
-		       (t (second example))))
-           test-result)
-      (when (eq print? t)
-        (format t "~&> ~S~%" exp))
-      (setf * (eval exp))
-      (when (eq print? t)
-        (format t "~&~S~%" *))
-      (setf test-result (eval test))
-      (when (null test-result)
-        (case print?
-          ((FAIL) (format t "~&;;; FAILURE on ~S; expected ~S, got:~%;;; ~S~%"
-                          exp test *))
-          ((T) (format t "~&;;; FAILURE: expected ~S" test))
-          (otherwise)))
-      test-result)))
-  
+      (let* ((exp (first example))
+             (* nil)
+             (test (cond ((null (second example)) t)
+                         ((constantp (second example))
+                          `(equal * ,(second example)))
+                         (t (second example))))
+             test-result)
+        (when (eq print? t)
+          (format t "~&> ~S~%" exp))
+        (setf * (eval exp))
+        (when (eq print? t)
+          (format t "~&~S~%" *))
+        (setf test-result (eval test))
+        (when (null test-result)
+          (case print?
+            ((FAIL) (format t "~&;;; FAILURE on ~S; expected ~S, got:~%;;; ~S~%"
+                            exp test *))
+            ((T) (format t "~&;;; FAILURE: expected ~S" test))
+            (otherwise)))
+        test-result)))
+

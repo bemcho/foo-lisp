@@ -4,14 +4,14 @@
 (in-package #:aima)
 
 (deftest utilities
-  "Test all the utility functions."
+    "Test all the utility functions."
 
   "Test the CLOS implementation"
   ((defstruct shape))
   ((defstruct (triangle (:include shape))
      base height))
   ((defstruct (rectangle (:include shape))
-       height width))
+     height width))
   
   ((defmethod area ((x triangle))
      (* 1/2 (triangle-base x) (triangle-height x))))

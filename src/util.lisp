@@ -33,6 +33,7 @@
                    ((atom x) (cons x acc))
                    (t (rec (car x) (rec (cdr x) acc))))))
     (rec x nil)))
+
 (defun prune (test tree)
   (labels ((rec (tree acc)
              (cond ((null tree) (nreverse acc))
@@ -145,9 +146,9 @@
   (if (some #'atom args)
       (apply fn args)
       (apply #'mapcar
-               #'(lambda (&rest args)
-                   (apply #'rmapcar fn args))
-                 args)))
+             #'(lambda (&rest args)
+                 (apply #'rmapcar fn args))
+             args)))
 ;;i/o functions
 (defun readlist (&rest args)
   (values (read-from-string
@@ -180,4 +181,4 @@
   (map 'list #'(lambda (c)
                  (intern (make-string 1
                                       :initial-element c)))
-        (symbol-name sym)))
+       (symbol-name sym)))

@@ -6,9 +6,9 @@
 (defstruct (dirt (:include object (name "*") (size 0.01))))
 
 (defstruct (vacuum-world (:include grid-environment
-    (size (@ 8 8))
-    (aspec '(random-vacuum-agent))
-    (cspec '((at all (P 0.25 dirt))))))
+                                   (size (@ 8 8))
+                                   (aspec '(random-vacuum-agent))
+                                   (cspec '((at all (P 0.25 dirt))))))
   "A grid with some dirt in it, and by default a reactive vacuum agent.")
 
 ;;;; Defining the generic functions
@@ -21,7 +21,7 @@
      (if (equal (object-loc (agent-body agent))
 		(grid-environment-start env))
 	 0
-       1000)))
+         1000)))
 
 (defmethod get-percept ((env vacuum-world) agent)
   "Percept is a three-element sequence: bump, dirt and home."

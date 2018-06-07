@@ -10,7 +10,7 @@
 ;;; as determined by the performance measure.
 
 (defstruct agent
-    "Agents take actions (based on percepts and the agent program) and receive
+  "Agents take actions (based on percepts and the agent program) and receive
   a score (based on the performance measure).  An agent has a body which can
   take action, and a program to choose the actions, based on percepts."
   (program #'nothing)			; fn: percept -> action
@@ -36,12 +36,12 @@
 (defun initialize-agent-names (env)
   "Name the agents 1, 2, ... if they don't yet have a name."
   (for each agent in (environment-agents env) do
-       (when (null (agent-name agent))
-	 (let ((i (+ 1 (position agent (environment-agents env))))
-	       (body (agent-body agent)))
-	   (setf (agent-name agent) i)
-	   (when (and body (null (object-name body)))
-	     (setf (object-name body) i))))))
+      (when (null (agent-name agent))
+        (let ((i (+ 1 (position agent (environment-agents env))))
+              (body (agent-body agent)))
+          (setf (agent-name agent) i)
+          (when (and body (null (object-name body)))
+            (setf (object-name body) i))))))
 
 ;; Design Decision Notes
 

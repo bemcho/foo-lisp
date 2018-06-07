@@ -49,7 +49,7 @@
     (setf (object-loc object) (object-loc container))
     (pushnew object (object-contents container))
     object))
-    
+
 (defun remove-object (object env)
   "Remove the object from its current location."
   (let ((loc (object-loc object))

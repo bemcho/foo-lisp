@@ -112,7 +112,7 @@
   (setf *player-pos* (find-empty-node))
   (setf *visited-nodes* (list *player-pos*))
   (setf *game-message* (format nil "You are on node [~d]" *player-pos*)))
-  
+
 (defun find-empty-node ()
   (let ((x (random-node)))
     (if (cdr (assoc x *congestion-city-nodes*))
